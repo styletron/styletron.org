@@ -1,0 +1,24 @@
+{
+  "name": "with-mdx",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "static": "rm -rf dist && next build && next export -o dist && cp -r v3 ./dist"
+  },
+  "dependencies": {
+    "@mdx-js/mdx": "0.16.5",
+    "@zeit/next-css": "^1.0.1",
+    "@zeit/next-mdx": "1.2.0",
+    "next": "^8.0.1",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
+    "react-live": "^1.12.0",
+    "react-syntax-highlighter": "^10.1.2",
+    "styletron-engine-atomic": "^1.0.13",
+    "styletron-react": "^4.4.4"
+  },
+  "devDependencies": {},
+  "license": "MIT"
+}
