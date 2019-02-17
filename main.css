@@ -1,10 +1,17 @@
-/* PrismJS 1.15.0
-https://prismjs.com/download.html#themes=prism-coy&languages=markup+css+clike+javascript */
-/**
- * prism.js Coy theme for JavaScript, CoffeeScript, CSS and HTML
- * Based on https://github.com/tshedor/workshop-wp-theme (Example: http://workshop.kansan.com/category/sessions/basics or http://workshop.timshedor.com/category/sessions/basics);
- * @author Tim  Shedor
- */
+* {
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.burger .burger-lines,
+.burger .burger-lines:after,
+.burger .burger-lines:before {
+  background-color: #000;
+}
+
+.burger {
+  font-size: 0.5em;
+  background-color: #fff;
+}
 
 .react-live {
   margin-top: -36px;
@@ -22,7 +29,7 @@ https://prismjs.com/download.html#themes=prism-coy&languages=markup+css+clike+ja
 }
 
 .react-live-preview {
-  border-left: 10px solid #ffe1a5;
+  border-left: 5px solid #43b982;
   padding-left: 1.5em;
   background-color: #fdfdfd;
 }
@@ -66,7 +73,7 @@ pre[class*="prism-code"],
 pre[class*="hljs"],
 pre[class*="language-"] > code {
   position: relative;
-  border-left: 10px solid #358ccb;
+  border-left: 5px solid #358ccb;
   padding-left: 1.5em;
   background-color: rgba(0, 0, 0, 0.01);
   background-image: linear-gradient(
@@ -214,7 +221,7 @@ pre[class*="language-"]:after {
   opacity: 0.7;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 880px) {
   pre[class*="language-"] > code {
     border-left: 3px solid #358ccb;
     padding-left: 1em;
@@ -223,6 +230,20 @@ pre[class*="language-"]:after {
   pre[class*="language-"]:after {
     bottom: 14px;
     box-shadow: none;
+  }
+}
+
+@media screen and (max-width: 590px) {
+  .react-live > pre,
+  pre[class*="hljs"] {
+    width: 80vw;
+  }
+}
+
+@media screen and (max-width: 470px) {
+  .react-live > pre,
+  pre[class*="hljs"] {
+    width: 75vw;
   }
 }
 

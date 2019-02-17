@@ -1,6 +1,13 @@
 import { styled } from "styletron-react";
 
-const Wrapper = styled("div", { maxWidth: "20em" });
+const Wrapper = styled("div", {
+  marginTop: "0.25em",
+  maxWidth: "20em",
+  "@media screen and (max-width: 880px)": {
+    marginTop: "2em",
+    maxWidth: "12em"
+  }
+});
 
 const Logo = () => (
   <Wrapper>

@@ -4,13 +4,16 @@ import { Provider as StyletronProvider, styled } from "styletron-react";
 import Router from "next/router";
 import { styletron } from "../helpers/styletron";
 import { trackPageView } from "../helpers/ga";
-import "../prism-coy.css";
+import { MOBILE_BREAKPOINT } from "../conts";
+import "@animated-burgers/burger-squeeze/dist/styles.css";
+import "../main.css";
 
 const Content = styled("div", {
-  maxWidth: "40em",
+  maxWidth: "50em",
   margin: "0px auto",
   padding: "6em 1.5em 6em 1.5em",
-  "@media screen and (max-width: 767px)": {
+  [MOBILE_BREAKPOINT]: {
+    maxWidth: "32em",
     padding: "2em 1.5em 2em 1.5em"
   }
 });

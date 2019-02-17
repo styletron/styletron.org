@@ -9,7 +9,10 @@ const Editable = styled("div", {
   right: "10px",
   textTransform: "uppercase",
   fontWeight: "bold",
-  textAlign: "right"
+  textAlign: "right",
+  "@media screen and (max-width: 600px)": {
+    visibility: "hidden"
+  }
 });
 
 const FILTERED = [

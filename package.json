@@ -8,9 +8,11 @@
     "static": "rm -rf dist && next build && next export -o dist && cp -r v3 ./dist"
   },
   "dependencies": {
+    "@animated-burgers/burger-squeeze": "^1.1.2",
     "@mdx-js/mdx": "0.16.5",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-mdx": "1.2.0",
+    "classnames": "^2.2.6",
     "next": "^8.0.1",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
