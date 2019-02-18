@@ -24,6 +24,11 @@ export default {
   h4: ({ children }) => <Heading element="h4">{children}</Heading>,
   h5: ({ children }) => <Heading element="h5">{children}</Heading>,
   h6: ({ children }) => <Heading element="h6">{children}</Heading>,
+  a: ({ children, href }) => (
+    <a target="_blank" href={href}>
+      {children}
+    </a>
+  ),
   pre: ({ children }) => children,
   code: ({ children, metaString, className }) => {
     if (metaString === "live") {

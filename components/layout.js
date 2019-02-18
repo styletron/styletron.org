@@ -107,7 +107,10 @@ class Layout extends React.Component {
     sidebarVisible: false
   };
   render() {
-    const pathIndex = ROUTES.findIndex(route => route.path === this.props.path);
+    const pathIndex = ROUTES.findIndex(
+      route =>
+        route.path.replace(/\//g, "") === this.props.path.replace(/\//g, "")
+    );
     const prevRoute = pathIndex > 0 ? pathIndex - 1 : -1;
     const nextRoute =
       pathIndex > -1 && pathIndex < ROUTES.length - 1 ? pathIndex + 1 : -1;
