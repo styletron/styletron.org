@@ -240,6 +240,7 @@ pre[class*="language-"]:after {
 
 @media screen and (max-width: 590px) {
   .react-live > pre,
+  .react-live-error,
   pre[class*="hljs"] {
     width: 80vw;
   }
@@ -247,6 +248,7 @@ pre[class*="language-"]:after {
 
 @media screen and (max-width: 470px) {
   .react-live > pre,
+  .react-live-error,
   pre[class*="hljs"] {
     width: 75vw;
   }
