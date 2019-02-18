@@ -128,23 +128,28 @@ class Layout extends React.Component {
             </SidebarButtonWrap>
             <SidebarList $isVisible={this.state.sidebarVisible}>
               <SidebarItem>
-                <Link href="/">
+                <Link href="/" prefetch>
                   <a>Home</a>
                 </Link>
               </SidebarItem>
               <SidebarItem>
-                <Link href="/">
-                  <a>Getting Started not easy</a>
+                <Link href="/getting-started" prefetch>
+                  <a>Getting Started</a>
                 </Link>
               </SidebarItem>
               <SidebarItem>
-                <Link href="/">
+                <Link href="/react" prefetch>
+                  <a>Use with React</a>
+                </Link>
+              </SidebarItem>
+              <SidebarItem>
+                <Link href="/concepts" prefetch>
                   <a>Concepts</a>
                 </Link>
               </SidebarItem>
               <SidebarItem>
-                <Link href="/">
-                  <a>API docs</a>
+                <Link href="/api" prefetch>
+                  <a>API Docs</a>
                 </Link>
               </SidebarItem>
             </SidebarList>
