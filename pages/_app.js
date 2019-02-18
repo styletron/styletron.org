@@ -1,5 +1,6 @@
 import React from "react";
 import App, { Container } from "next/app";
+import Head from "next/head";
 import { Provider as StyletronProvider, styled } from "styletron-react";
 import Router from "next/router";
 import { styletron } from "../helpers/styletron";
@@ -28,6 +29,9 @@ export default class MyApp extends App {
     const { Component, pageProps } = this.props;
     return (
       <Container>
+        <Head>
+          <title>Styletron</title>
+        </Head>
         <StyletronProvider value={styletron}>
           <Content>
             <Component {...pageProps} />
