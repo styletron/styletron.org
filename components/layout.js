@@ -11,7 +11,7 @@ import Burger from "@animated-burgers/burger-squeeze";
 import { MDXProvider } from "@mdx-js/tag";
 import Link from "next/link";
 import { styled } from "styletron-react";
-import { MOBILE_BREAKPOINT } from "../conts";
+import { MOBILE_BREAKPOINT, ROUTES } from "../conts";
 
 import MarkdownElements from "./markdown-elements";
 
@@ -100,11 +100,17 @@ const TwoColumnLayout = styled("div", {
   }
 });
 
+const getATarget = route =>
+  route === "https://github.com/styletron/styletron" ? "_blank" : undefined;
 class Layout extends React.Component {
   state = {
     sidebarVisible: false
   };
   render() {
+    const pathIndex = ROUTES.findIndex(route => route.path === this.props.path);
+    const prevRoute = pathIndex > 0 ? pathIndex - 1 : -1;
+    const nextRoute =
+      pathIndex > -1 && pathIndex < ROUTES.length - 1 ? pathIndex + 1 : -1;
     return (
       <React.Fragment>
         <TwoColumnLayout>
@@ -112,6 +118,26 @@ class Layout extends React.Component {
             <MDXProvider components={MarkdownElements}>
               {this.props.children}
             </MDXProvider>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              {prevRoute > -1 ? (
+                <Link href={ROUTES[prevRoute].path} prefetch>
+                  <a target={getATarget(ROUTES[prevRoute].path)}>
+                    ← {ROUTES[prevRoute].text}
+                  </a>
+                </Link>
+              ) : (
+                <div />
+              )}
+              {nextRoute > -1 ? (
+                <Link href={ROUTES[nextRoute].path} prefetch>
+                  <a target={getATarget(ROUTES[nextRoute].path)}>
+                    {ROUTES[nextRoute].text} →
+                  </a>
+                </Link>
+              ) : (
+                <div />
+              )}
+            </div>
           </Content>
           <Sidebar>
             <SidebarButtonWrap>
@@ -127,31 +153,13 @@ class Layout extends React.Component {
               </BurgerWrap>
             </SidebarButtonWrap>
             <SidebarList $isVisible={this.state.sidebarVisible}>
-              <SidebarItem>
-                <Link href="/" prefetch>
-                  <a>Home</a>
-                </Link>
-              </SidebarItem>
-              <SidebarItem>
-                <Link href="/getting-started" prefetch>
-                  <a>Getting Started</a>
-                </Link>
-              </SidebarItem>
-              <SidebarItem>
-                <Link href="/react" prefetch>
-                  <a>Use with React</a>
-                </Link>
-              </SidebarItem>
-              <SidebarItem>
-                <Link href="/concepts" prefetch>
-                  <a>Concepts</a>
-                </Link>
-              </SidebarItem>
-              <SidebarItem>
-                <Link href="/api" prefetch>
-                  <a>API Docs</a>
-                </Link>
-              </SidebarItem>
+              {ROUTES.map(route => (
+                <SidebarItem key={route.path}>
+                  <Link href={route.path} prefetch>
+                    <a target={getATarget(route.path)}>{route.text}</a>
+                  </Link>
+                </SidebarItem>
+              ))}
             </SidebarList>
           </Sidebar>
         </TwoColumnLayout>

@@ -2,6 +2,11 @@
   -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
+a {
+  box-shadow: 0 1px 0 0 currentColor;
+  text-decoration: none;
+}
+
 .burger .burger-lines,
 .burger .burger-lines:after,
 .burger .burger-lines:before {
