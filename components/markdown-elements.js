@@ -1,9 +1,20 @@
 import * as React from "react";
 import Anchor from "./anchor";
 import { useHover } from "./hooks";
+import { styled } from "styletron-react";
 import slugify from "../helpers/slugify";
 import Code from "./code";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+
+const InlineCode = styled("code", {
+  backgroundColor: "rgba(27, 31, 35, 0.05)",
+  borderRadius: "3px",
+  fontSize: "85%",
+  margin: 0,
+  padding: "0.2em 0.4em",
+  fontFamily:
+    "SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;"
+});
 
 const Heading = ({ element, children }) => {
   const [hoverRef, isHovered] = useHover();
@@ -30,6 +41,7 @@ export default {
     </a>
   ),
   pre: ({ children }) => children,
+  inlineCode: ({ children }) => <InlineCode>{children}</InlineCode>,
   code: ({ children, metaString, className }) => {
     if (metaString === "live") {
       return <Code code={children} />;

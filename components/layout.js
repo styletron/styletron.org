@@ -11,7 +11,7 @@ import Burger from "@animated-burgers/burger-squeeze";
 import { MDXProvider } from "@mdx-js/tag";
 import Link from "next/link";
 import { styled } from "styletron-react";
-import { MOBILE_BREAKPOINT, ROUTES } from "../conts";
+import { MOBILE_BREAKPOINT, ROUTES } from "../const";
 
 import MarkdownElements from "./markdown-elements";
 
