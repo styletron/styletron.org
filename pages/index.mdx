@@ -16,7 +16,10 @@ import { styled } from "styletron-react";
 export default () => {
   // Create a styled component by passing
   // an element name and a style object
-  const Anchor = styled("a", { fontSize: "20px" });
+  const Anchor = styled("a", {
+    fontSize: "20px",
+    color: "red"
+  });
   return <Anchor href="/getting-started">Start!</Anchor>;
 };
 ```
@@ -31,13 +34,16 @@ What is happening behind the scene? Styletron processes the style object and cre
     .b3 {
       font-size: 20px;
     }
+    .cb {
+      color: red;
+    }
   </style>
 </head>
 ```
 
-**The class name is auto-generated** and can change any time. Since Styletron uses the `<style />` tag, you could use **media queries** and other selectors as well. You could not do that with inline styles! Check [Concepts](/concepts) for more info.
+**The class names are auto-generated**. You don't have to come up with names! Since Styletron uses the `<style />` tag, you could use **media queries** and other selectors as well. You could not do that with inline styles! Check [Concepts](/concepts) for more info.
 
-Then, it creates the anchor element and sets its `className` prop to `.b3`. **Btw, the example is editable!** Try to add an another CSS rule!
+Then, the `Anchor` component is created and its `className` prop is set to `".b3 .cb"`.
 
 ## Features
 
