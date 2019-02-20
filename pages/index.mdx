@@ -28,24 +28,31 @@ export default () => {
 
 Styletron provides [styletron-react](https://www.npmjs.com/package/styletron-react) with some handy React utilities. In the example above, we use the `styled` function to create a styled React component.
 
-What is happening behind the scene? Styletron processes the style object and creates a new class name:
+**What is happening behind the scene?**
 
 ```html
-<head>
-  <style>
-    .b3 {
-      font-size: 20px;
-    }
-    .cb {
-      color: red;
-    }
-  </style>
-</head>
+<html>
+  <head>
+    <style>
+      .foo {
+        font-size: 20px;
+      }
+      .bar {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/getting-started" class="foo bar">Start!</a>
+  </body>
+</html>
 ```
 
-**The class names are auto-generated**. You don't have to come up with names! Since Styletron uses the `<style />` tag, you could use **media queries** and other selectors as well. You could not do that with inline styles! Check [Concepts](/concepts) for more info.
+Styletron processes the style object and creates two atomic classes. **The class names are auto-generated**. So you don't have to worry about the [naming methodologies](http://getbem.com/introduction/)! **That's great!** What's less great? The generated names are not stable and will change all the time so you should never target them. If you need a stable selector for something as e2e tests, you should add `data-test-id` attribute.
 
-Then, the `Anchor` component is created and its `className` prop is set to `".b3 .cb"`.
+Since Styletron uses the `<style />` tag, you can use **media queries** and other selectors as well. You could not do that with inline styles! Check [Concepts](/concepts) for more information about how classic CSS translates into CSS in JS.
+
+Finally, the `Anchor` component is created and its `className` prop is set to `".foo .bar"`.
 
 ## Features
 
