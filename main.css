@@ -238,7 +238,7 @@ pre[class*="language-"]:after {
   }
 }
 
-@media screen and (max-width: 590px) {
+@media screen and (max-width: 620px) {
   .react-live > pre,
   .react-live-error,
   pre[class*="hljs"] {

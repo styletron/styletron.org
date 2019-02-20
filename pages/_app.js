@@ -10,12 +10,11 @@ import "@animated-burgers/burger-squeeze/dist/styles.css";
 import "../main.css";
 
 const Content = styled("div", {
-  maxWidth: "50em",
-  margin: "0px auto",
-  padding: "6em 1.5em 6em 1.5em",
+  display: "flex",
+  justifyContent: "center",
+  padding: "6em 1.5em",
   [MOBILE_BREAKPOINT]: {
-    maxWidth: "32em",
-    padding: "2em 1.5em 2em 1.5em"
+    padding: "2em 1.5em"
   }
 });
 

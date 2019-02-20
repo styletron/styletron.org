@@ -4,4 +4,289 @@ export default Layout;
 
 # Getting Started
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. In quis leo faucibus, rhoncus mi sed, dignissim nunc. Aenean tristique mollis metus, et volutpat ex ullamcorper ac. Sed fringilla magna at eros posuere vulputate. Nullam eu sagittis nulla. Maecenas vitae velit eu orci varius porta.
+Styletron is distributed through [npmjs.com](https://www.npmjs.com/). It consists of a few packages. **The basic React setup requires adding two of them**:
+
+```bash
+yarn add styletron-engine-atomic styletron-react
+```
+
+## Packages
+
+- [styletron-engine-atomic](https://www.npmjs.com/package/styletron-engine-atomic) is all you need to start with Styletron. It is an implementation of the [styletron-standard](https://www.npmjs.com/package/styletron-standard) engine interface.
+- [styletron-react](https://www.npmjs.com/package/styletron-react) provides additional React bindings so you can easily create styled React components.
+
+## Starting with
+
+1. [React](#with-react)
+2. [Fusion.js](#with-fusionjs)
+3. [Next.js](#with-nextjs)
+4. [Gatsby](#with-gatsby)
+5. [Vanilla JS](#with-javascript)
+
+## With React
+
+**You need to wrap your application root with the `StyletronProvider`** and pass an instance of Styletron into it. [React context](https://reactjs.org/docs/context.html) is used on the background to ensure that CSS rules are properly extracted and CSS classes created.
+
+```jsx
+import { Provider as StyletronProvider } from "styletron-react";
+import { Client as Styletron } from "styletron-engine-atomic";
+
+// 1. Create a client engine instance
+const engine = new Styletron();
+
+// 2. Provide the engine to the app
+React.render(
+  <StyletronProvider value={engine}>
+    <App />
+  </StyletronProvider>
+);
+```
+
+### Server-side rendering
+
+Styletron also supports **server-side rendering** so you can generate the styles on server and then "hydrate" the client. This can significantly improve the loading time of your application!
+
+#### Extracting server-rendered styles
+
+```jsx
+import { Provider as StyletronProvider } from "styletron-react";
+import { Server as Styletron } from "styletron-engine-atomic";
+
+// 1. Create a server engine instance
+const engine = new Styletron();
+
+// 2. Provide the engine to the app
+const html = React.render(
+  <StyletronProvider value={engine}>
+    <App />
+  </StyletronProvider>
+);
+
+// 3. Extract critical styles after SSR
+const styles = engine.getStylesheetsHtml();
+// → "<style ..."
+```
+
+#### Hydrating server-rendered styles
+
+```diff
+import {Provider as StyletronProvider} from "styletron-react";
+import {Client as Styletron} from "styletron-engine-atomic";
+
+- const engine = new Styletron();
++ const engine = new Styletron({
++  hydrate: document.getElementsByClassName("_styletron_hydrate_")
++ });
+
+React.render(
+  <StyletronProvider value={engine}>
+    <App/>
+  </StyletronProvider>
+);
+```
+
+## With Fusion.js
+
+[Fusion.js](https://fusionjs.com/) is a a plugin-based universal web framework. Your application might already support Styletron! Check if [fusion-plugin-styletron-react](https://github.com/fusionjs/fusion-plugin-styletron-react) has been installed. If not, run
+
+```bash
+yarn add fusion-plugin-styletron-react
+```
+
+Register the plugin in `src/main.js`
+
+```js
+import App from "fusion-react";
+import Styletron from "fusion-plugin-styletron-react";
+import root from "./components/root";
+
+export default () => {
+  const app = new App(root);
+  app.register(Styletron);
+  return app;
+};
+```
+
+Then you can directly import `styled` function:
+
+```js
+import { styled } from "fusion-plugin-styletron-react";
+```
+
+## With Next.js
+
+[Next.js](https://nextjs.org/) is a popular React framework. First, add Styletron dependencies:
+
+```bash
+yarn add styletron-engine-atomic styletron-react
+```
+
+Create `styletron.js`:
+
+```js
+import { Client, Server } from "styletron-engine-atomic";
+
+const getHydrateClass = () =>
+  document.getElementsByClassName("_styletron_hydrate_");
+
+export const styletron =
+  typeof window === "undefined"
+    ? new Server()
+    : new Client({
+        hydrate: getHydrateClass()
+      });
+```
+
+Create or update `pages/_app.js`:
+
+```jsx
+import React from "react";
+import App, { Container } from "next/app";
+import { Provider as StyletronProvider } from "styletron-react";
+import { styletron } from "../styletron";
+
+export default class MyApp extends App {
+  render() {
+    const { Component, pageProps } = this.props;
+    return (
+      <Container>
+        <StyletronProvider value={styletron}>
+          <Component {...pageProps} />
+        </StyletronProvider>
+      </Container>
+    );
+  }
+}
+```
+
+Create or update `pages/_document.js`:
+
+```jsx
+import Document, { Head, Main, NextScript } from "next/document";
+import { Provider as StyletronProvider } from "styletron-react";
+import { styletron } from "../styletron";
+
+class MyDocument extends Document {
+  static getInitialProps(props) {
+    const page = props.renderPage(App => props => (
+      <StyletronProvider value={styletron}>
+        <App {...props} />
+      </StyletronProvider>
+    ));
+    const stylesheets = styletron.getStylesheets() || [];
+    return { ...page, stylesheets };
+  }
+
+  render() {
+    return (
+      <html>
+        <Head>
+          {this.props.stylesheets.map((sheet, i) => (
+            <style
+              className="_styletron_hydrate_"
+              dangerouslySetInnerHTML={{ __html: sheet.css }}
+              media={sheet.attrs.media || ""}
+              key={i}
+            />
+          ))}
+        </Head>
+        <body>
+          <Main />
+          <NextScript />
+        </body>
+      </html>
+    );
+  }
+}
+
+export default MyDocument;
+```
+
+That's it! Now you should be able to style your components and the styles should be server-side rendered. `pages/index.js`:
+
+```jsx
+import { styled } from "styletron-react";
+
+const Colored = styled("div", { color: "blue" });
+
+function Home() {
+  return <Colored>Welcome to next.js!</Colored>;
+}
+
+export default Home;
+```
+
+## With Gatsby
+
+[Gatsby](https://www.gatsbyjs.org) is a fast modern site generator for React. First, add Styletron dependencies:
+
+```bash
+yarn add styletron-engine-atomic styletron-react
+```
+
+Update `gatsby-browser.js`:
+
+```jsx
+import React from "react";
+import { Client as Styletron } from "styletron-engine-atomic";
+import { Provider } from "styletron-react";
+
+const engine = new Styletron({
+  hydrate: document.getElementsByClassName("_styletron_hydrate_")
+});
+
+export const wrapRootElement = ({ element }, options) => (
+  <Provider value={engine}>{element}</Provider>
+);
+```
+
+Update `gatsby-ssr.js`:
+
+```jsx
+import React from "react";
+import { Server as Styletron } from "styletron-engine-atomic";
+import { Provider } from "styletron-react";
+
+const engine = new Styletron();
+
+export const wrapRootElement = ({ element }, options) => (
+  <Provider value={engine}>{element}</Provider>
+);
+
+export const onRenderBody = ({ setHeadComponents }, options) => {
+  const stylesheets = engine.getStylesheets();
+  const headComponents = stylesheets[0].css
+    ? stylesheets.map((sheet, index) => (
+        <style
+          className="_styletron_hydrate_"
+          dangerouslySetInnerHTML={{
+            __html: sheet.css
+          }}
+          key={index}
+          media={sheet.attrs.media}
+        />
+      ))
+    : null;
+
+  setHeadComponents(headComponents);
+};
+```
+
+That's it! Now you should be able to style your components and the styles should be server-side rendered (in production build). `src/pages/index.js`:
+
+```jsx
+import React from "react";
+import { styled } from "styletron-react";
+
+const Colored = styled("div", { color: "blue" });
+
+function Home() {
+  return <Colored>Welcome to Gatsby!</Colored>;
+}
+
+export default Home;
+```
+
+## With JavaScript
+
+**Do you use some other framework? Or no framework at all?** You can directly use `styletron-engine-atomic` to render styles. Check the [API documentation](https://github.com/styletron/styletron/tree/master/packages/styletron-engine-atomic).

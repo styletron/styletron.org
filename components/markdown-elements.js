@@ -35,11 +35,15 @@ export default {
   h4: ({ children }) => <Heading element="h4">{children}</Heading>,
   h5: ({ children }) => <Heading element="h5">{children}</Heading>,
   h6: ({ children }) => <Heading element="h6">{children}</Heading>,
-  a: ({ children, href }) => (
-    <a target="_blank" href={href}>
-      {children}
-    </a>
-  ),
+  a: ({ children, href }) => {
+    const parts = href.split("#");
+    const target = parts[0] === "" && parts[1] !== "" ? undefined : "_blank";
+    return (
+      <a target={target} href={href}>
+        {children}
+      </a>
+    );
+  },
   pre: ({ children }) => children,
   inlineCode: ({ children }) => <InlineCode>{children}</InlineCode>,
   code: ({ children, metaString, className }) => {

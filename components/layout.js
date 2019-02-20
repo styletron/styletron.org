@@ -17,6 +17,7 @@ import MarkdownElements from "./markdown-elements";
 
 const Content = styled("div", {
   marginTop: "-1.25em",
+  maxWidth: "37em",
   [MOBILE_BREAKPOINT]: {
     marginTop: "-5em"
   }
