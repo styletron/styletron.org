@@ -1,5 +1,10 @@
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
-import { styled } from "styletron-react";
+import {
+  styled,
+  withStyle,
+  withStyleDeep,
+  withTransform
+} from "styletron-react";
 
 const Editable = styled("div", {
   position: "relative",
@@ -15,11 +20,7 @@ const Editable = styled("div", {
   }
 });
 
-const FILTERED = [
-  'import { styled } from "styletron-react";',
-  "export",
-  "default"
-];
+const FILTERED = [/^import.*/gi, "export", "default"];
 
 const transformCode = code =>
   FILTERED.reduce((acc, token) => acc.replace(token, ""), code);
@@ -30,7 +31,10 @@ const Code = ({ code }) => (
     mountStylesheet={false}
     transformCode={transformCode}
     scope={{
-      styled
+      styled,
+      withStyle,
+      withStyleDeep,
+      withTransform
     }}
   >
     <Editable>editable</Editable>

@@ -4,17 +4,18 @@ export default Layout;
 
 # Use with React
 
-**This page describes the motivation of why to use Styletron and React together.** It also goes over some APIs that `styletron-react` provides and pitfalls that you can run into. If you need to setup Styletron for your project, please check the [Getting Started](/getting-started) page!
+**This page describes why Styletron is a great fit for React.** It also goes over some APIs that `styletron-react` provides and pitfalls that you can run into. If you are trying to set up Styletron for your project, please check the [Getting Started](/getting-started) page first!
 
 1. [Motivation](#motivation)
 2. [Styled Components](#styled-components)
 3. [Props Filtering](#props-filtering)
 4. [`$as` prop](#as-prop)
 5. [`$ref` prop](#ref-prop)
+6. [Composing Styles](#composing-styles)
 
 ## Motivation
 
-**React components are independent and reusable pieces of UI**. They accept props and return a description of what should appear on the screen - typically, in a form of HTML markup. For long time, the styles were left outside and done by different means. You probably wrote or saw this code before:
+**React components are independent and reusable pieces of UI**. They accept props and return a description of what should appear on the screen - typically, in a form of HTML markup. For long time, the styles were left outside of React components and handled by different means. You probably wrote or saw this code before:
 
 ```jsx live
 class MyApp extends React.Component {
@@ -39,11 +40,19 @@ class MyApp extends React.Component {
 }
 ```
 
-It is pretty clear that `MyApp` renders a button that can be in active/inactive state. **What's not clear is how the resulting button looks like**. We can tell it uses `.btn` and `.btn-active` CSS classes but we don't know where those classes are defined, what rules they apply or what the overall workflow story is. Suddenly, our encapsulated piece of UI heavily relies on a code that lives outside of it. **It lost independence and isolation**. We can't just simply copy&paste it into a different project and expect it to work. **It's not portable**.
+It is pretty clear that `MyApp` renders a button that can be in active or inactive state. **What's not clear is the button's appearance**. It applies `.btn` and `.btn-active` CSS classes but we don't know where those classes are defined, what rules they contain and what the overall import/build process is. Suddenly, our encapsulated piece of UI heavily relies on a code that lives outside of it. **Our component lost its independence and isolation**. We can't just simply copy&paste it into a different project and expect it to work. **It's not portable anymore**.
 
-To make it even more awkward, **the component state should directly control what CSS rules are applied**: _When the button is active, its background should be blue_. We have to joggle class names and glue together the `className` prop. It gets even less readable if there are more states. We call this concept **dynamic styling**. We have a need to map props/state directly into the resulting styles.
+To make it even more awkward, **the component state should directly control the button's appearance or what CSS rules are applied**. _When the button is active, its background should be blue_. We have to toggle class names and glue together the `className` prop. It gets even less readable if there are multiple states.
 
-But I have great news for you! **We can solve all the issues described above by using inline styles**:
+```jsx
+className={`btn ${isActive ? "btn-active" : ""}`}
+```
+
+We call this concept **dynamic styling**. It happens when we need to map `props` and `state` directly into the resulting styles. This is very hard with classic CSS since you cannot easily pass variables from JavaScript to CSS.
+
+_Side note: CSS modules partly addresses some of these concerns but still requires an extra tooling and their portability story is generally weak._
+
+Things are looking grim so far. But what if I told you that **we can solve all those issues by using inline styles**?
 
 ```jsx live
 class MyApp extends React.Component {
@@ -75,13 +84,15 @@ class MyApp extends React.Component {
 }
 ```
 
-All the styles are now encapsulated in the component. We can clearly see what rules are being used. We don't have to worry about a special build process. **Oh, and no `className` joggling either - we don't even have classNames anymore!** But, inline styles have some very serious limitations: You can't use pseudo selectors as `:hover` or media queries.
+All styles are now encapsulated in the component. We can clearly see what rules are being used. We don't have to worry about a special build process. **Oh, and no `className` joggling either - we don't even have classNames now!** But, inline styles have some very serious limitations: For example, you can't use pseudo selectors like `:hover` or media queries.
 
 If there was only a way how to get the best of both worlds. 🤔
 
+… \*drum roll\* … introducing
+
 ## Styled Components
 
-**Styletron provides an API and developer experience similar to inline styles but without any drawbacks**. Let's do the button example again, but this time with Styletron:
+**Styletron provides APIs and developer experience similar to inline styles but without any drawbacks**. Let's do the button example again but this time with Styletron:
 
 ```jsx live
 import { styled } from "styletron-react";
@@ -119,39 +130,41 @@ class MyApp extends React.Component {
 }
 ```
 
-It looks somewhat similar to the inline style example. The styles are still defined inside of the component but we are doing an extra step now - **we are creating a styled component**.
+It looks somewhat similar to the inline style example. The styles are still defined inside of the component; however, this time we are doing an extra step - **we are creating a styled component with the `styled` function**.
 
 The `styled` function expects two arguments:
 
 - **Element type** - What underlying DOM element should be used. In our case, we chose `button`.
-- **Style function / object** - To describe the styles. It can be a plain styled object or a function that returns a styled object. The function gets `props`. That's useful if your styles dynamic needs to be dynamic (derived from `props`).
+- **Style function / object** - To describe the styles. It can be a plain styled object or a function that returns a styled object. The function gets `props`. That's useful if your styles need to be dynamic (derived from `props`).
 
-For styling properties, we use camelCase and there are some other subtle differences described in [Concepts](/concept). We can also use pseudo classes as `:hover`, that would not be possible with inline styles.
+For styling properties, we use camelCase and there are some other subtle differences described in [Concepts](/concept). We can also now use pseudo classes as `:hover`. **The inline styles limitations don't apply anymore!**
 
-Once the styled component is created, we can render it as any other React component. **We don't need to specify `style` or `className` prop**. The styled component already did that for us on the background - Styletron created a bunch of CSS classes and "glued" them to the `<Button />` component. Check the [Home page example](/#example) for more details.
+Once the styled component is created, we can render it as any other React component. **We don't need to specify `style` or `className` prop**. The styled component already does that for us on the background - Styletron creates a bunch of CSS classes and "glues" them to the `<button />` element. Check the [Home page example](/#example) for more details.
 
-One thing that seems a bit off is `$isActive` prop. Why do we use `$` when we could simply call it `isActive` instead?
+One thing that might seem a bit off is the `$isActive` prop. Why do we use `$` when we could simply call it `isActive` instead?
 
 ## Props Filtering
 
 Note that we are passing two props into our styled `Button` component
 
 ```jsx
-<Button $isActive={/*...*/} onClick={/*...*/}>...</Button>
+<Button $isActive={/*…*/} onClick={/*…*/}>…</Button>
 ```
 
-but they have very different purposes:
+and they have very different purposes:
 
-- `$isActive` is used to determine the correct (dynamic) styling
-- `onClick` is an event handler that needs to be passed to the underlying `button` element, we don't use it for styling purposes
+- `$isActive` is used to create the style object
+- `onClick` is an event handler that needs to be passed to the underlying `button` element, we don't use it for styling purposes at all
 
-**Styletron doesn't see the difference.** It doesn't know if the passed prop is going to be used only in the `styled` function or if it should be passed all the way down to underlying element. **What happens if all props are passed to the DOM element?** This error:
+The problem is **Styletron doesn't see the difference.** It doesn't know what props should or shouldn't be passed all the way down to the underlying element. **What happens when all props are blindly passed to the DOM element?**
 
 > Warning: React does not recognize the `$isActive` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `$isactive` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
 
-So you need to help Styletron a bit. **All props starting with `$` are filtered out and not passed to the underlying element**. Styletron could whitelist all DOM attributes and filter out other props but that's [considered as an anti-pattern](https://twitter.com/dan_abramov/status/822526388557250560?lang=en). Mostly, because it would make the bundle bigger and it's bad for performance.
+So you need to help Styletron a bit. **All props starting with `$` are filtered out and not passed to the underlying element**. That's the only and whole purpose of `$`.
 
-The warning message above was manufactured since `$isActive` is filtered out by Styletron.
+Styletron could whitelist all DOM attributes and filter out other props but that's [considered as an anti-pattern](https://twitter.com/dan_abramov/status/822526388557250560?lang=en). Mostly, because it would make the bundle bigger and it's bad for performance.
+
+The warning message above was manufactured since `$isActive` is filtered out by Styletron. However, if you renamed it to `isActive` you would see it!
 
 ## `$as` prop
 
@@ -161,15 +174,15 @@ The warning message above was manufactured since `$isActive` is filtered out by 
 () => {
   const Text = styled("p", { color: "red" });
   return (
-    <React.Fragment>
+    <>
       <Text>Rendered as a paragraph</Text>
       <Text $as="button">Rendered as a button</Text>
-    </React.Fragment>
+    </>
   );
 };
 ```
 
-This can be especially useful when you need to swap between `a` and `button` or `h1`, `h2`, `h3`. You don't need to create multiple styled components.
+This can be especially useful when you need to swap between `a` and `button` or `h1`, `h2`, `h3`. You don't need to create multiple styled components for that.
 
 ## `$ref` prop
 
@@ -186,12 +199,12 @@ class MyApp extends React.Component {
   }
   render() {
     return (
-      <React.Fragment>
+      <>
         <input ref={this.inputRef} />
         <button onClick={() => this.inputRef.current.focus()}>
           Focus input
         </button>
-      </React.Fragment>
+      </>
     );
   }
 }
@@ -204,16 +217,18 @@ import { styled } from "styletron-react";
 
 const Input = styled("input", { background: "#FFE1A5" });
 
-// ...
+// …
 <Input ref={this.inputRef} />;
-// ...
+// …
 ```
 
 React will complain:
 
 > Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
 
-**`styled` creates a function component** and not class based component. **Function components can't accept a ref**. React gives a great suggestion to library maintainers to forward refs with [React.forwardRef](https://reactjs.org/docs/forwarding-refs.html) API. This is a fairly new feature (React v16.3). Most likely, Styletron [will adopt it](https://github.com/styletron/styletron/issues/253) in the next major version. In meantime, Styletron provides an alternative ref forwarding API through the `$ref` prop:
+**`styled` creates a function component** and not class based component. **Function components can't accept a ref**.
+
+React gives a great suggestion to library maintainers to forward refs with [React.forwardRef](https://reactjs.org/docs/forwarding-refs.html) API. This is a fairly new feature (React v16.3). Styletron [will most likely adopt it](https://github.com/styletron/styletron/issues/253) in the next major version. In meantime, Styletron provides an alternative ref forwarding scheme through the `$ref` prop:
 
 ```jsx live
 import { styled } from "styletron-react";
@@ -225,15 +240,146 @@ class MyApp extends React.Component {
   render() {
     const Input = styled("input", { background: "#FFE1A5" });
     return (
-      <React.Fragment>
+      <>
         <Input $ref={this.inputRef} />
         <button onClick={() => this.inputRef.current.focus()}>
           Focus input
         </button>
-      </React.Fragment>
+      </>
     );
   }
 }
 ```
 
-Just rename `ref` to `$ref`. That's it!
+**Just rename `ref` to `$ref`**. That's it!
+
+## Composing Styles
+
+Styled components are quite locked down. They come with defined styles and underlying DOM element. You can swap the DOM element with the [`$as` prop](#as-prop) but **what if you want to tweak some styles** as well?
+
+`styletron-react` exports several composition functions. These can be used to create new styled components by composing styles from existing ones. You don't need to create a new component from scratch. Perfect for tweaks!
+
+### withStyle
+
+Do you need to slightly modify an existing styled component like changing the color?
+
+```jsx live
+import { withStyle, styled } from "styletron-react";
+
+export default () => {
+  const RedButton = styled("button", {
+    color: "red",
+    border: "2px solid black",
+    display: "block",
+    margin: "1em 0"
+  });
+  const BlueButton = withStyle(RedButton, { color: "blue" });
+  return (
+    <>
+      <RedButton>Red Button</RedButton>
+      <BlueButton>Blue Button</BlueButton>
+    </>
+  );
+};
+```
+
+**`BlueButton` overrides the `color` property** but keeps other `RedButton`'s styles intact. This is especially useful if you don't own the `RedButton` component and you can't change its API (adding `$isBlue` prop?).
+
+### withStyleDeep
+
+The style object can be nested when pseudo classes (`:hover`, `:focus`, etc.) are used. The problem is that `withStyle` blindly overrides only the first level:
+
+```jsx live
+import { withStyle, styled } from "styletron-react";
+
+export default () => {
+  const HoverRed = styled("button", {
+    ":hover": {
+      color: "red",
+      border: "2px dashed black"
+    },
+    border: "2px solid black",
+    display: "block",
+    margin: "1em 0"
+  });
+  const HoverBlue = withStyle(HoverRed, {
+    ":hover": {
+      color: "blue"
+    }
+  });
+  return (
+    <>
+      <HoverRed>Hover Red Button</HoverRed>
+      <HoverBlue>Hover Blue Button</HoverBlue>
+    </>
+  );
+};
+```
+
+`HoverBlue` gets blue when hovered but it doesn't have the dashed border. That's because `withStyle` replaced the whole `:hover` property and _didn't look inside_. To fix that, you can use `withStyleDeep` instead:
+
+```jsx live
+import { withStyleDeep, styled } from "styletron-react";
+
+export default () => {
+  const HoverRed = styled("button", {
+    ":hover": {
+      color: "red",
+      border: "2px dashed black"
+    },
+    border: "2px solid black",
+    display: "block",
+    margin: "1em 0"
+  });
+  const HoverBlue = withStyleDeep(HoverRed, {
+    ":hover": {
+      color: "blue"
+    }
+  });
+  return (
+    <>
+      <HoverRed>Hover Red Button</HoverRed>
+      <HoverBlue>Hover Blue Button</HoverBlue>
+    </>
+  );
+};
+```
+
+`:hover` object is now deeply merged and `HoverBlue` preserves the dashed border style.
+
+#### Note
+
+`withStyle` and `withStyleDeep` are powerful functions but you should avoid over-using them. Often times, it's better to update the original component and add some addition props to it. For example, instead of
+
+```jsx
+const PrimaryButton = withStyle(Button, { color: "blue" });
+const SecondaryButton = withStyle(Button, { color: "green" });
+const TertiaryButton = withStyle(Button, { color: "yellow" });
+```
+
+it might be better to add `type` property to the `Button` component
+
+```jsx
+const getButtonColor = type => {
+  switch(type) {
+    case "primary":
+      return "blue";
+    case "secondary":
+      return "green";
+    case "tertiary":
+      return "yellow";
+    default:
+      return "black";
+  }
+}
+
+const Button = styled('button', props => ({
+  color: getButtonColor(props.type)
+}))
+
+<Button type="primary" />
+<Button type="secondary" />
+<Button type="tertiary" />
+```
+
+It's more verbose but you will end up with a single component `Button` that doesn't rely on internal styles. In the future, you can decide to replace `color` by `backgroundColor` and it will not break "withStyled" components.
