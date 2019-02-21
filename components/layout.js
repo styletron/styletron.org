@@ -101,6 +101,12 @@ const TwoColumnLayout = styled("div", {
   }
 });
 
+const PrevNextLinks = styled("div", {
+  display: "flex",
+  justifyContent: "space-between",
+  marginTop: "3em"
+});
+
 const getATarget = route =>
   route === "https://github.com/styletron/styletron" ? "_blank" : undefined;
 class Layout extends React.Component {
@@ -122,7 +128,7 @@ class Layout extends React.Component {
             <MDXProvider components={MarkdownElements}>
               {this.props.children}
             </MDXProvider>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <PrevNextLinks>
               {prevRoute > -1 ? (
                 <Link href={ROUTES[prevRoute].path} prefetch>
                   <a target={getATarget(ROUTES[prevRoute].path)}>
@@ -141,7 +147,7 @@ class Layout extends React.Component {
               ) : (
                 <div />
               )}
-            </div>
+            </PrevNextLinks>
           </Content>
           <Sidebar>
             <SidebarButtonWrap>

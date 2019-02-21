@@ -1,5 +1,6 @@
 import * as React from "react";
 import Anchor from "./anchor";
+import Link from "next/link";
 import { useHover } from "./hooks";
 import { styled } from "styletron-react";
 import slugify from "../helpers/slugify";
@@ -16,9 +17,40 @@ const InlineCode = styled("code", {
     "SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;"
 });
 
+const Blockquote = styled("blockquote", {
+  backgroundColor: "rgba(27, 31, 35, 0.03)",
+  borderRadius: "3px",
+  margin: 0,
+  padding: "1em 3em",
+  ":before": {
+    position: "absolute",
+    color: "#ccc",
+    content: "open-quote",
+    fontSize: "4em",
+    marginLeft: "-0.55em",
+    marginTop: "-0.4em"
+  },
+  ":after": {
+    float: "right",
+    color: "#ccc",
+    content: "close-quote",
+    fontSize: "4em",
+    marginRight: "-0.55em",
+    marginTop: "-0.55em"
+  }
+});
+
+const getText = children => {
+  if (children && Array.isArray(children)) {
+    return children.reduce((acc, child) => {
+      return `${acc} ${child.props ? getText(child.props.children) : child}`;
+    }, "");
+  }
+  return children;
+};
 const Heading = ({ element, children }) => {
   const [hoverRef, isHovered] = useHover();
-  const slug = slugify(children);
+  const slug = slugify(getText(children));
   return React.createElement(
     element,
     { ref: hoverRef, id: slug },
@@ -35,13 +67,17 @@ export default {
   h4: ({ children }) => <Heading element="h4">{children}</Heading>,
   h5: ({ children }) => <Heading element="h5">{children}</Heading>,
   h6: ({ children }) => <Heading element="h6">{children}</Heading>,
+  blockquote: ({ children }) => <Blockquote>{children}</Blockquote>,
   a: ({ children, href }) => {
     const parts = href.split("#");
-    const target = parts[0] === "" && parts[1] !== "" ? undefined : "_blank";
+    const target =
+      (parts[0] === "" && parts[1] !== "") || !href.includes("http")
+        ? undefined
+        : "_blank";
     return (
-      <a target={target} href={href}>
-        {children}
-      </a>
+      <Link href={href} prefetch>
+        <a target={target}>{children}</a>
+      </Link>
     );
   },
   pre: ({ children }) => children,
