@@ -138,11 +138,11 @@ It looks somewhat similar to the inline style example. The styles are still defi
 The `styled` function expects two arguments:
 
 - **Element type** - What underlying DOM element should be used. In our case, we chose `button`.
-- **Style function / object** - To describe the styles. It can be a plain styled object or a function that returns a styled object. The function gets `props`. That's useful if your styles need to be dynamic (derived from `props`).
+- **Style function / object** - To describe the styles. It can be a plain style object or a function that returns a style object. The function gets `props`. That's useful if your styles need to be dynamic (derived from `props`).
 
 For styling properties, we use camelCase and there are some other subtle differences described in [Concepts](/concept). We can also now use pseudo classes as `:hover`. **The inline styles limitations don't apply anymore!**
 
-Once the styled component is created, we can render it as any other React component. **We don't need to specify `style` or `className` prop**. The styled component already does that for us on the background - Styletron creates a bunch of CSS classes and "glues" them to the `<button />` element. Check the [Home page example](/#example) for more details.
+Once the styled component is created, we can render it as any other React component. **We don't need to set `style` or `className` prop**. The styled component already does that for us on the background - Styletron creates a bunch of CSS classes and "glues" them to the `<button />` element. Check the [Home page example](/#example) for more details.
 
 One thing that might seem a bit off is the `$isActive` prop. Why do we use `$` when we could simply call it `isActive` instead?
 
@@ -319,7 +319,7 @@ export default () => {
 };
 ```
 
-`HoverBlue` gets blue when hovered but it doesn't have the dashed border. That's because `withStyle` replaced the whole `:hover` property and _didn't look inside_. To fix that, you can use `withStyleDeep` instead:
+`HoverBlue` gets blue when hovered but it doesn't have the dashed border anymore. That's because `withStyle` replaced the whole `:hover` property and _didn't look inside_. To fix that, you can use `withStyleDeep` instead:
 
 ```jsx live
 import { withStyleDeep, styled } from "styletron-react";
@@ -352,7 +352,7 @@ export default () => {
 
 #### Note
 
-`withStyle` and `withStyleDeep` are powerful functions but you should avoid over-using them. Often times, it's better to update the original component and add some addition props to it. For example, instead of
+`withStyle` and `withStyleDeep` are powerful functions but you should avoid over-using them. Often times, it's better to update the original component and add some additional props to it. For example, instead of
 
 ```jsx
 const PrimaryButton = withStyle(Button, { color: "blue" });
@@ -385,13 +385,13 @@ const Button = styled('button', props => ({
 <Button type="tertiary" />
 ```
 
-It's more verbose but you will end up with a single component `Button` that doesn't rely on internal styles. In the future, you can decide to replace `color` by `backgroundColor` and it will not break "withStyled" components.
+It's more verbose but you will end up with a single component `Button` that doesn't rely on internal styles of some other component. In the future, you can decide to replace `color` by `backgroundColor` and it will not break "withStyled" components.
 
 ## displayName
 
 > The displayName string is used in debugging messages. Usually, you don’t need to set it explicitly because it’s inferred from the name of the function or class that defines the component. You might want to set it explicitly if you want to display a different name for debugging purposes or when you create a higher-order component, see Wrap the Display Name for Easy Debugging for details.
 
-Since **`styled` is technically a higher-order component**, we need to set the `displayName` explicitly to see the real component names when debugging (or snapshot testing). If you are tired of doing this manually, we provide `babel-plugin-transform-styletron-display-name` that will do this for you!
+Since **`styled` is technically a higher-order component**, we need to set the `displayName` explicitly to see the real component name when debugging (or shallow snapshot testing). If you are tired of doing this manually, we provide `babel-plugin-transform-styletron-display-name` that will do this for you!
 
 ```bash
 yarn add babel-plugin-transform-styletron-display-name
@@ -511,11 +511,13 @@ export default () => {
 
 We are accessing the `THEME` through React Context and passing it as the `$theme` prop so every `StyledComponent` (aka component using our new `styled` function) can use it.
 
-Finally, we need to wrap the root of our application with `ThemeProvider` so the `THEME` constant is passed to the whole React tree. If we wanted to enable switching between multiple themes, we could place the related logic into `ThemeProvider` component.
+Finally, we need to wrap the root of our application with `ThemeProvider` so the `THEME` constant is passed to the whole React tree. If we wanted to enable switching between multiple themes, we could place the related logic into the `ThemeProvider` component.
 
 ## Testing
 
 You can test styled components as any other React component. Just don't forget to wrap the tested component with Styletron's `Provider`!
+
+### Snapshot Testing
 
 One popular approach is [snapshot testing](https://jestjs.io/docs/en/snapshot-testing). You can emit (render) the HTML markup, save it into a file and diff it on the next run. This will prevent unwanted changes in the component's output.
 
@@ -559,3 +561,9 @@ exports[`Button: HTML 1`] = `
 ```
 
 We captured **both the HTML markup and related CSS**.
+
+### End-to-end Testing
+
+The generated class names are not stable and will change often (unless the component is sandboxed as in the snapshot test above) so you should never target them. If you need a stable selector for your e2e tests, you should add `data-test-id` attribute.
+
+[Puppeteer](https://github.com/GoogleChrome/puppeteer) is a great solution for e2e test!

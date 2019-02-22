@@ -42,11 +42,11 @@ React.render(
 );
 ```
 
-### Server-side rendering
+### Server-side Rendering
 
-Styletron also supports **server-side rendering** so you can generate the styles on server and then "hydrate" the client. This can significantly improve the loading time of your application!
+Styletron also supports **server-side rendering** so you can generate the styles on the server and then "hydrate" the client. This can significantly improve the loading time of your application!
 
-#### Extracting server-rendered styles
+#### Extracting Server-rendered Styles
 
 ```jsx
 import { Provider as StyletronProvider } from "styletron-react";
@@ -67,7 +67,7 @@ const styles = engine.getStylesheetsHtml();
 // → "<style ..."
 ```
 
-#### Hydrating server-rendered styles
+#### Hydrating Server-rendered Styles
 
 ```diff
 import {Provider as StyletronProvider} from "styletron-react";
@@ -87,7 +87,7 @@ React.render(
 
 ## With Fusion.js
 
-[Fusion.js](https://fusionjs.com/) is a plugin-based universal web framework. Your application might already support Styletron! Check if [fusion-plugin-styletron-react](https://github.com/fusionjs/fusion-plugin-styletron-react) has been installed. If not, run
+[Fusion.js](https://fusionjs.com/) is a plugin-based universal web framework. Your application might already support Styletron out of the box! Check if [fusion-plugin-styletron-react](https://github.com/fusionjs/fusion-plugin-styletron-react) has been installed. If not, run
 
 ```bash
 yarn add fusion-plugin-styletron-react
@@ -297,4 +297,4 @@ export default Home;
 
 ## With JavaScript
 
-**Do you use some other framework? Or no framework at all?** You can directly use `styletron-engine-atomic` to render styles. Check the [API documentation](https://github.com/styletron/styletron/tree/master/packages/styletron-engine-atomic).
+**Do you use some other framework? Or no framework at all?** You can directly use `styletron-engine-atomic` to render styles. Check the [API documentation](/api).

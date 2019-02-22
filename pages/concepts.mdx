@@ -243,7 +243,7 @@ export default () => {
 };
 ```
 
-`Child` is not a direct descendant of `Parent` and yet, it still gets the right value. We are crossing component boundaries without passing additional `props` or using a CSS combinator.
+`Child` is not a direct descendant of `Parent` and yet, it still gets the value `blue`. We are crossing component boundaries without passing additional `props` or using a CSS combinator.
 
 ### Descendant Hover
 
@@ -467,7 +467,7 @@ export default () => {
 };
 ```
 
-**This snippet works as expected**. The lesson here is to not forget about double quotes when using properties as `content` since browsers expect that the resulting value will be surrounded by `" "` and the first level of quotes is there just because of JavaScript.
+**This snippet works as expected**. The lesson here is to not forget about double quotes when using properties as `content` since browsers expect that the resulting value will be surrounded by `" "` and the first pair of quotes is there just because of JavaScript.
 
 **This doesn't not work:**
 
