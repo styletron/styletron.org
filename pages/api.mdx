@@ -4,4 +4,378 @@ export default Layout;
 
 # API
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. In quis leo faucibus, rhoncus mi sed, dignissim nunc. Aenean tristique mollis metus, et volutpat ex ullamcorper ac. Sed fringilla magna at eros posuere vulputate. Nullam eu sagittis nulla. Maecenas vitae velit eu orci varius porta.
+1. [styletron-engine-atomic](#styletron-engine-atomic)
+2. [styletron-react](#styletron-react)
+
+## styletron-engine-atomic
+
+Atomic implementation of the [`styletron-standard`](../styletron-standard) engine interface. This package provides two named exports:
+
+- [`Client`](#client) - Client-side engine class
+- [`Server`](#server) - Server-side engine class
+
+### `Client`
+
+```js
+import { Client } from "styletron-engine-atomic";
+```
+
+#### `.constructor(opts?: {prefix?: string, hydrate?: HTMLStyleElement[], container: Element})`
+
+##### Options
+
+- `prefix?: string` The prefix to be used for all generated atomic identifiers (e.g. class names, `@keyframes` names, etc.)
+- `hydrate?: HTMLStyleElement[]` Collection of server-rendered style elements. Hydration is required when server-side rendering.
+- `container?: Element` The element that new stylesheets should be appended to. Defaults to the parent element of the first stylesheet passed via `hydrate`, otherwise defaults to `document.head`.
+
+```js
+const instance = new Client();
+```
+
+- [`.renderStyle(style) => string`](#renderstylestyle-string)
+- [`.renderKeyframes(keyframes) => string`](#renderkeyframeskeyframes-string)
+- [`.renderFontFace(fontFace) => string`](#renderfontfacefontface-string)
+
+### `Server`
+
+```js
+import { Server } from "styletron-engine-atomic";
+```
+
+#### `.constructor(opts?: {prefix?: string})`
+
+##### Options
+
+- `prefix?: string` The prefix to be used for all generated atomic identifiers (e.g. class names, `@keyframes` names, etc.)
+
+```js
+const instance = new Server();
+```
+
+#### `.getStylesheets() => Array<{css: string, attrs: {[string]: string}}>`
+
+Returns styles as an array of stylesheet objects.
+
+#### `.getStylesheetsHtml(className: string) => string`
+
+Returns styles as a string of HTML that can also be used for client-side hydration.
+
+#### `.getCss() => string`
+
+Returns styles as a string of CSS for purely server-side rendering use cases where no client-side hydration is needed.
+
+- [`.renderStyle(style) => string`](#renderstylestyle-string)
+- [`.renderKeyframes(keyframes) => string`](#renderkeyframeskeyframes-string)
+- [`.renderFontFace(fontFace) => string`](#renderfontfacefontface-string)
+
+### Universal methods
+
+These methods exist on both the server and client instances.
+
+#### `.renderStyle(style) => string`
+
+Renders a given style object, returning the corresponding generated class name.
+
+```js
+instance.renderStyle({
+  color: "red",
+  fontSize: "12px"
+});
+// → "a b"
+```
+
+#### `.renderKeyframes(keyframes) => string`
+
+Renders a given keyframes object, returning the corresponding generated `@keyframes` rule name.
+
+```js
+const animationName = instance.renderKeyframes({
+  from: { color: "red" },
+  to: { color: "blue" }
+});
+// → "a"
+```
+
+#### `.renderFontFace(fontFace) => string`
+
+Renders a given font face object, returning the font-family name from the corresponding generated `@font-face` rule.
+
+```js
+const fontFamily = instance.renderFontFace({
+  src: "..."
+});
+// → "a"
+```
+
+## styletron-react
+
+The `styletron-react` package consists of the following named exports:
+
+- [`styled`](#styled)
+- [`withStyle`](#withstyle)
+- [`withStyleDeep`](#withstyledeep)
+- [`withTransform`](#withtransform)
+- [`withWrapper`](#withwrapper)
+- [`Provider`](#provider)
+- [`createStyled`](#createstyled)
+
+### `styled`
+
+```js
+import { styled } from "styletron-react";
+```
+
+The `styled` function is used to create a styled component.
+
+#### Params
+
+1. `base` (`string` | `React.ComponentType`)
+2. `style` (`Style` | `(props: Object) => Style`)
+
+```js
+// Static styles
+const Foo = styled("div", { color: "red" });
+
+<Foo />;
+
+// Prop-driven styles
+const Foo = styled("div", props => {
+  return { color: props.$fraction < 0.5 ? "red" : "green" };
+});
+
+<Foo $fraction={Math.random()} />;
+```
+
+### `withStyle`
+
+```js
+import { withStyle } from "styletron-react";
+```
+
+Use `withStyle` for style composition via shallow object merging.
+
+#### Params
+
+1. `styledComponent` (`StyledComponent`)
+2. `style` (`Style` | `(props: Object) => Style`)
+
+#### Examples
+
+```jsx
+const Foo = styled("div", { color: "red", background: "red" });
+
+// Static styles
+const Bar = withStyle(Foo, { background: "green" });
+
+// Prop-driven styles
+const Baz = withStyle(Foo, props => ({
+  letterSpacing: props.$crushed ? "-5px" : "0px"
+}));
+```
+
+### `withStyleDeep`
+
+```js
+import { withStyleDeep } from "styletron-react";
+```
+
+Use `withStyleDeep` for style composition via deep object merging.
+
+#### Params
+
+1. `styledComponent` (`StyledComponent`)
+2. `style` (`Style` | `(props: Object) => Style`)
+
+#### Examples
+
+```jsx
+const Foo = styled("div");
+
+// Static styles
+const Bar = withStyleDeep(Foo, {":hover": {background: "green"}});
+
+// Props-driven styles
+const Bar = withStyleDeep(Foo, props => ({
+  ":hover": {background: props.$green ? "green" : "white"}
+});
+```
+
+### `withTransform`
+
+```js
+import { withTransform } from "styletron-react";
+```
+
+Shallow and deep object merging gets the job done most of the time, but for more control over composition, `withTransform` allows for direct style manipulation via an arbitrary transformation function.
+
+#### Params
+
+1. `styledComponent` (`StyledComponent`)
+2. `transform` (`(style: Style, props: Object) => Style`)
+
+#### Examples
+
+```jsx
+const Foo = styled("div");
+
+const Bar = withTransform(Foo, (style, props) => {
+  let display =
+    style.display === "none"
+      ? "none"
+      : props.$inline === true
+      ? "inline-flex"
+      : "flex";
+  return { ...style, display };
+});
+```
+
+### `withWrapper`
+
+```js
+import { withWrapper } from "styletron-react";
+```
+
+Use `withWrapper` to add wrapping components while preserving the ability to compose styles later on.
+
+#### Params
+
+1. `styledComponent` (`StyledComponent`)
+2. `wrapFn` (`StyledComponent => props => ReactElement`)
+
+#### Examples
+
+```jsx
+// New proposed React context API
+const { Provider, Consumer } = React.createContext(/* ... */);
+
+const Foo = styled("div", { color: "red" });
+
+const Wrapped = withWrapper(Foo, Styled => props => (
+  <Consumer>{value => <Styled {...props} arbitraryProp={value} />}</Consumer>
+));
+
+// Style composition still works as normal
+const Bar = withStyle(Wrapped, { background: "red" });
+```
+
+### `Provider`
+
+```js
+import { Provider } from "styletron-react";
+```
+
+A Styletron engine must be provided using the `Provider` component.
+
+#### Props
+
+- `value` (`StyletronEngine`)
+- `debugMode?` (`true` | `"ssr"` | `false`)
+
+#### Examples
+
+```jsx
+import { Provider } from "styletron-react";
+import { Client as Styletron } from "styletron-engine-atomic";
+
+const engine = new Styletron();
+
+const App = () => (
+  <Provider value={engine}>
+    <RootComponent />
+  </Provider>
+);
+```
+
+#### Browser debug mode
+
+In the browser, there's an optional debug mode which will render debug classes to styled elements which point to the JS source location of the styled component. This mode can be enabled with the `debugMode` prop on the client side `Provider`.
+
+##### Example
+
+<img
+  height="550"
+  src="https://user-images.githubusercontent.com/780408/39457018-ac42410e-4c9f-11e8-91e7-ac2da8bfe230.gif"
+/>
+
+**Providing the debug utility**
+
+Instantiate the debug utility and pass it to the Provider.
+
+```diff
++ import {DebugEngine} from "styletron-react";
+
++ const debug = process.env.NODE_ENV === "production"
++   ? void 0
++   : new DebugEngine();
+
+const App = () => (
+- <Provider value={engine}>
++ <Provider value={engine} debug={debug}>
+    <RootComponent/>
+  </Provider>
+);
+```
+
+**Hydrating from SSR**
+
+When hydrating from SSR, set the `debugAfterHydration` prop to `true` to prevent warnings from mismatched client/server rendered markup. This will trigger a one-time re-render after initial hydration to add the debug classes.
+
+```diff
+import {Provider, DebugEngine} from "styletron-react";
+
+const debug = process.env.NODE_ENV === "production"
+  ? void 0
+  : new DebugEngine();
+
+const App = () => (
+-  <Provider value={engine} debug={debug}>
++  <Provider value={engine} debug={debug} debugAfterHydration>
+    <RootComponent/>
+  </Provider>
+);
+```
+
+**Debug utility interface**
+
+```
+interface DebugEngine {
+  debug({stackIndex, stackInfo}) : string
+}
+```
+
+### `createStyled`
+
+```js
+import { createStyled } from "styletron-react-core";
+```
+
+Returns a `styled` function.
+
+#### Params
+
+- `opts.getInitialStyle`: (`void => StyleObject`)
+- `opts.driver`: (`(StyleObject, Engine) => string`)
+- `opts.wrapper`: (`StatelessFunctionalComponent<*> => StatelessFunctionalComponent<*>`)
+
+#### Examples
+
+```js
+import { createStyled } from "styletron-react";
+import type { StyleObject, StandardEngine } from "styletron-standard";
+
+function driver(style: StyleObject, engine: any): string {
+  return engine.someMethod(style);
+}
+
+function getInitialStyle(): StyleObject {
+  return {};
+}
+
+const wrapper = StyledComponent => props => (
+  <div>
+    <StyledComponent {...props} />
+  </div>
+);
+
+const styled = createStyled({ getInitialStyle, driver, wrapper });
+```

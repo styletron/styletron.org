@@ -1,4 +1,5 @@
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
+import { useHover } from "./hooks";
 import {
   styled,
   withStyle,
@@ -34,7 +35,8 @@ const Code = ({ code }) => (
       styled,
       withStyle,
       withStyleDeep,
-      withTransform
+      withTransform,
+      useHover
     }}
   >
     <Editable>editable</Editable>

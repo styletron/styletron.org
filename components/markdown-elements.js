@@ -41,13 +41,18 @@ const Blockquote = styled("blockquote", {
 });
 
 const getText = children => {
-  if (children && Array.isArray(children)) {
-    return children.reduce((acc, child) => {
-      return `${acc} ${child.props ? getText(child.props.children) : child}`;
-    }, "");
-  }
-  return children;
+  let label = "";
+  React.Children.forEach(children, child => {
+    if (typeof child === "string") {
+      label += child;
+    }
+    if (child.props && child.props.children) {
+      label += getText(child.props.children);
+    }
+  });
+  return label;
 };
+
 const Heading = ({ element, children }) => {
   const [hoverRef, isHovered] = useHover();
   const slug = slugify(getText(children));
@@ -86,7 +91,7 @@ export default {
     if (metaString === "live") {
       return <Code code={children} />;
     }
-    const lang = className.split("-")[1];
+    const lang = className ? className.split("-")[1] : "text";
     return (
       <SyntaxHighlighter language={lang} useInlineStyles={false}>
         {children}

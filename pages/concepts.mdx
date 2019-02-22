@@ -4,4 +4,453 @@ export default Layout;
 
 # Concepts
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. In quis leo faucibus, rhoncus mi sed, dignissim nunc. Aenean tristique mollis metus, et volutpat ex ullamcorper ac. Sed fringilla magna at eros posuere vulputate. Nullam eu sagittis nulla. Maecenas vitae velit eu orci varius porta.
+CSS in JS is not just about "throwing" some CSS into `.js` files. **CSS in JS comes with a different philosophy**. You can still use the most of CSS constructs but there are some quirks and limitations and a different approach is needed. Those restrictions are not necessarly bad but can be certainly frustrating if you are new to this. This page should answer most of your "_How to do x in Styletron_" questions and describe some best practices.
+
+Most of the concepts bellow are not related to React but we still use React and `styletron-react` to implement them.
+
+## Style Object
+
+CSS properties are defined as a JS object and that has some limitations compared to the pure CSS.
+
+```css
+.btn {
+  color: red;
+  font-size: 16px;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+```
+
+should turn into
+
+```jsx live
+import { styled } from "styletron-react";
+
+export default () => {
+  const Button = styled("button", {
+    color: "red",
+    fontSize: "16px",
+    paddingLeft: "1em",
+    paddingRight: "1em"
+  });
+  return <Button>Button</Button>;
+};
+```
+
+We use camelCase for property names since JS can't handle `-` as an object key. Although, you can add quotes to work around it:
+
+```js
+{
+  "font-size": "16px",
+  "padding-left": "1em",
+  "padding-right": "1em"
+}
+```
+
+This code still works but we usually try to avoid it in JavaScript. Use camelCase instead.
+
+## Style Function
+
+```text
+props => CSS styles
+```
+
+Component's styles often change based on its props. We call it **dynamic styling**. `styled`'s second argument accepts a function that gets `props` and should return a styled object.
+
+```jsx live
+import { styled } from "styletron-react";
+
+export default () => {
+  const Button = styled("button", props => ({
+    fontSize: props.$compact ? "12px" : "16px",
+    padding: props.$compact ? "0.25em" : "0.5em",
+    margin: "0.5em"
+  }));
+  return (
+    <>
+      <Button>Standard Button</Button>
+      <Button $compact>Compact Button</Button>
+    </>
+  );
+};
+```
+
+If you wonder why we called our prop `$compact` and not just `compact`, see [the explanation](/react#as-prop).
+
+## Media queries and pseudo classes
+
+The styled object can be nested so you can just inline media queries and most of pseudo classes.
+
+```jsx live
+import { styled } from "styletron-react";
+
+export default () => {
+  const Block = styled("div", {
+    backgroundColor: "#DDD",
+    color: "#000",
+    padding: "0.5em 1em",
+    border: "2px solid black",
+    ":hover": {
+      border: "2px dashed darkred"
+    },
+    "@media screen and (max-width: 880px)": {
+      backgroundColor: "#276EF1",
+      color: "#fff"
+    }
+  });
+  return <Block>I get blue when the browser window shrinks</Block>;
+};
+```
+
+Also, it might be a good idea to use the same breakpoints across multiple components. You can just abstract it into a constant:
+
+```jsx
+const MOBILE = "@media screen and (max-width: 880px)";
+const styles = {
+  [MOBILE]: {
+    backgroundColor: "#276EF1",
+    color: "#fff"
+  }
+};
+```
+
+## Selectors
+
+One of the premises of CSS in JS is too keep all styles local, isolated and avoid any [specificity shenanigans](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity). It is probably the most controversial thing about CSS in JS since it requires a significant mind shift and using other patterns.
+
+**Styletron doesn't support [simple selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors#Simple_selectors) and [combinators](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors#Combinators). You can still use [pseudo-classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes) and [pseudo-elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements).**
+
+CSS is a powerful language and complex selectors / combinators clash with our model. There are definitely some valid cases when things like descedant combinators should be used. We have been exploring a [possible API](https://github.com/styletron/styletron/issues/229) for that.
+
+For now, there are some workarounds for common use-cases that we recommend to use.
+
+### Child Combinator
+
+**CSS syntax: `A > B`**
+
+> Any element matching B that is a _direct_ child of an element matching A.
+
+For this use-case, you can use [React.Children.map](https://reactjs.org/docs/react-api.html#reactchildren) and [React.cloneElement](https://reactjs.org/docs/react-api.html#cloneelement) to pass additional children props. As a bonus, you can also pass the `index` prop, so you can simulate [:nth-child](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child) CSS pseudo class.
+
+```jsx live
+export default () => {
+  // createContext should be module scoped
+  // and imported by Parent and Child
+  const ParentContext = React.createContext();
+
+  const ButtonGroup = ({ children }) => {
+    return React.Children.map(children, (child, index) =>
+      React.cloneElement(child, { groupIndex: index })
+    );
+  };
+
+  const Button = ({ groupIndex, children }) => {
+    const Btn = styled("button", props => ({
+      margin: props.$isGrouped ? "0px" : "0 2em 0 0"
+    }));
+    return (
+      <Btn $isGrouped={typeof groupIndex !== "undefined"}>
+        {children} {groupIndex}
+      </Btn>
+    );
+  };
+
+  return (
+    <>
+      <p>
+        <ButtonGroup>
+          <Button>One</Button>
+          <Button>Two</Button>
+          <Button>Three</Button>
+        </ButtonGroup>
+      </p>
+      <p>
+        <Button>One</Button>
+        <Button>Two</Button>
+        <Button>Three</Button>
+      </p>
+    </>
+  );
+};
+```
+
+**This works only if `Button` is a direct child of `ButtonGroup`**. One downside of this solution is prop name pollution. The prop `groupIndex` is hard-coded in `ButtonGroup` and `Button` component can't use it for other purposes. However, it's not a big problem in real applications. Widely used higher order components do the same thing.
+
+On the other hand, you can test all the visual `Button` states in an isolation without `ButtonGroup`. You can render
+
+```jsx
+<Button groupIndex={0}>One</Button>
+<Button groupIndex={1}>Two</Button>
+<Button groupIndex={2}>Three</Button>
+```
+
+to achieve the `ButtonGroup` effect.
+
+### Descendant Combinator
+
+**CSS syntax: `A B`**
+
+> Any element matching B that is a _descendant_ of an element matching A (that is, a child, or a child of a child, etc.). the combinator is one or more spaces or dual greater than signs.
+
+If you want to control styles of descendant components, you can use [React Context](https://reactjs.org/docs/context.html) and the [context hook](https://reactjs.org/docs/hooks-reference.html#usecontext).
+
+```jsx live
+export default () => {
+  // createContext should be module scoped
+  // and imported by Parent and Child
+  const ParentContext = React.createContext();
+
+  const Parent = ({ children }) => {
+    const { Provider } = ParentContext;
+    return <Provider value="blue">{children}</Provider>;
+  };
+
+  const Child = () => {
+    const Text = styled("div", props => ({
+      color: props.$color
+    }));
+    const value = React.useContext(ParentContext);
+    return <Text $color={value}>This text is {value}.</Text>;
+  };
+
+  return (
+    <Parent>
+      <div>
+        <Child />
+      </div>
+    </Parent>
+  );
+};
+```
+
+`Child` is not a direct descendant of `Parent` and yet, it still gets the right value. We are crossing component boundaries without passing additional `props` or using CSS.
+
+### Descendant Hover
+
+React hook [useHover](https://usehooks.com/useHover/) provides a nice concise API to have full control over hover states:
+
+```jsx live
+export default () => {
+  const [hoverRef, hovered] = useHover();
+  const Parent = styled("div", {
+    backgroundColor: "#DDD",
+    textAlign: "center",
+    padding: "0.5em"
+  });
+  const Child = styled("span", props => ({
+    fontSize: "2em",
+    borderBottomWidth: "2px",
+    borderBottomStyle: "solid",
+    borderBottomColor: props.$hovered ? "darkred" : "#DDD"
+  }));
+  return (
+    <Parent $ref={hoverRef}>
+      <Child $hovered={hovered}>{hovered ? "😁" : "☹️"}</Child>
+    </Parent>
+  );
+};
+```
+
+This solution avoids using CSS altogether but it let's you pass `hovered` anywhere you want, typically to the children.
+
+Since JS is used instead, it's less efficient but preserves the component level encapsulation.
+
+## Fonts
+
+Do you need to use `@font-face`? Styletron provides a declarative way to do it. You can turn
+
+```css
+@font-face {
+  font-family: "Laila";
+  src: url("./static/Laila.ttf");
+}
+
+.font-laila {
+  font-family: "Laila", serif;
+}
+```
+
+into
+
+```jsx live
+import { styled } from "styletron-react";
+
+export default () => {
+  const FontLaila = styled("div", {
+    fontFamily: {
+      src: "url(./static/Laila.ttf)"
+    }
+  });
+  return <FontLaila>This is Laila font.</FontLaila>;
+};
+```
+
+## Keyframes
+
+CSS offers a powerful animation API `@keyframes`. Styletron provides a declarative way to use it. You can turn
+
+```css
+@keyframes move {
+  from {
+    margin-left: 80%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+
+.slide-in {
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  animation-name: move;
+}
+```
+
+into
+
+```jsx live
+import { styled } from "styletron-react";
+
+export default () => {
+  const SlideIn = styled("div", {
+    animationDuration: "3s",
+    animationIterationCount: "infinite",
+    animationName: {
+      from: {
+        marginLeft: "80%",
+        width: "300%"
+      },
+      to: {
+        marginLeft: "0%",
+        width: "100%"
+      }
+    }
+  });
+  return <SlideIn>This is animated.</SlideIn>;
+};
+```
+
+## Vendor Prefixes
+
+What are [vendor prefixes](https://developer.mozilla.org/en-US/docs/Glossary/Vendor_Prefix)?
+
+> Browser vendors sometimes add prefixes to experimental or nonstandard CSS properties and JavaScript APIs, so developers can experiment with new ideas while—in theory—preventing their experiments from being relied upon and then breaking web developers' code during the standardization process.
+
+**Some of these experimental or nonstandard CSS properties are extremely useful** and developers don't want to wait for their standardization. Thus, they need to add correct vendor prefixes. Styletron uses [inline-style-prefixer](https://github.com/rofrischmann/inline-style-prefixer) to do this for you! It dynamically detects your browser version and adds vendor prefixes when needed.
+
+This is also pretty common technique used by CSS post/pre-processors. It's known as [autoprefixer](https://github.com/postcss/autoprefixer).
+
+Adding vendor prefixes manually is **tedious and verbose**:
+
+```css
+.boring {
+  -webkit-transition: 200ms all linear;
+  transition: 200ms all linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+```
+
+Styletron and `inline-style-prefixer` takes care of it:
+
+```jsx live
+import { styled } from "styletron-react";
+
+export default () => {
+  const Prefixed = styled("div", {
+    transition: "200ms all linear",
+    userSelect: "none",
+    boxSizing: "border-box",
+    display: "flex"
+  });
+  return (
+    <Prefixed>
+      Inspect this element in different browsers. Hey Safari. 😅
+    </Prefixed>
+  );
+};
+```
+
+## Gotchas
+
+### Shorthand And Longhand Properties
+
+Many CSS properties can be defined through the shorthand syntax. For example
+
+```css
+border-width: 2px;
+border-style: solid;
+border-color: black;
+```
+
+can be replaced by
+
+```css
+border: 2px solid black;
+```
+
+You can use both shorthand and longhand properties in Styletron; however, **you should never mix them in a single styled component**!
+
+This is perfectly fine in classic CSS
+
+```css
+.content {
+  border: 2px solid black;
+  border-width: 5px;
+}
+```
+
+since the order is always respected and `border-width` will be set to `5px`. But if you do the same thing in Styletron
+
+```css
+const Content = styled('div', {
+  border: '2px solid black',
+  borderWidth: '5px'
+});
+```
+
+it's not clear if the `border-width` will be `5px` or `2px`. Why?
+
+> JavaScript object is an **unordered collection of properties** each of which contains a primitive value, object, or function.
+
+The order is not deterministic. Also, Styletron splits each rule into a separate CSS class (Atomic CSS) and reuses same classes across multiple styled components. **So if some other component already uses the `borderWidth: '5px'`** rule and is mounted before the `Content` component, there is a great chance that **you will end up with `2px`**.
+
+For the same reason you should always avoid overlapping media queries.
+
+### Quotes
+
+```jsx live
+import { styled } from "styletron-react";
+
+export default () => {
+  const Button = styled("button", {
+    color: "white",
+    backgroundColor: "white",
+    "::before": {
+      content: '"…"',
+      color: "black",
+      display: "block",
+      position: "absolute"
+    }
+  });
+  return <Button>xx</Button>;
+};
+```
+
+**This snippet works as expected**. The lesson here is to not forget about double quotes when using properties as `content` since browsers expect that the resulting value will be surrounded by `" "` and the first level of quotes is there just because of JavaScript.
+
+**This doesn't not work:**
+
+```text
+content: '…',
+```
