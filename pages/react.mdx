@@ -12,6 +12,7 @@ export default Layout;
 4. [`$as` prop](#as-prop)
 5. [`$ref` prop](#ref-prop)
 6. [Composing Styles](#composing-styles)
+7. [Themes](#themes)
 
 ## Motivation
 
@@ -383,3 +384,94 @@ const Button = styled('button', props => ({
 ```
 
 It's more verbose but you will end up with a single component `Button` that doesn't rely on internal styles. In the future, you can decide to replace `color` by `backgroundColor` and it will not break "withStyled" components.
+
+## Themes
+
+You probably want to keep colors or sizing consistent across various components. A good practice is to keep these values defined in a single location so you can change them globally. You could create a module for this purpose:
+
+```js
+// theme.js
+const THEME = {
+  colors: {
+    primary: ["#276EF1", "#174EB6", "#9CBCF8"],
+    positive: ["#07A35A", "#057C44", "#88D3B0"]
+  },
+  sizing: ["2px", "6px", "10px", "16px", "24px"]
+};
+export default THEME;
+```
+
+and then import it in your components
+
+```jsx
+import { styled } from "styletron-react";
+import THEME from "./theme";
+
+export default () => {
+  const Card = styled("div", {
+    padding: THEME.sizing[3],
+    backgroundColor: THEME.colors.positive[0]
+  });
+};
+```
+
+This works but **there are some downsides**:
+
+- You have to always import the theme module
+- You can't easily dynamically switch between multiple themes (imagine having some dark mode toggle in your app)
+
+We can solve both issues by using [React Context](https://reactjs.org/docs/context.html) instead and creating our own enhanced `styled` function that will always hand over the theme to the styled function through the props argument:
+
+```jsx live
+import { createStyled } from "styletron-react";
+import { driver, getInitialStyle } from "styletron-standard";
+
+// code bellow would be normally module (top-level) scoped
+// to keep this example editable, it's wrapped by a React
+// function component
+export default () => {
+  const THEME = {
+    colors: {
+      primary: ["#276EF1", "#174EB6", "#9CBCF8"],
+      positive: ["#07A35A", "#057C44", "#88D3B0"]
+    },
+    sizing: ["2px", "6px", "10px", "16px", "24px"]
+  };
+
+  const { Provider, Consumer } = React.createContext();
+
+  const ThemeProvider = ({ children }) => (
+    <Provider value={THEME}>{children}</Provider>
+  );
+
+  const wrapper = StyledComponent =>
+    function withThemeHOC(props) {
+      return (
+        <Consumer>
+          {theme => <StyledComponent {...props} $theme={theme} />}
+        </Consumer>
+      );
+    };
+
+  const styled = createStyled({ wrapper, getInitialStyle, driver });
+
+  const Button = styled("button", ({ $theme }) => ({
+    backgroundColor: $theme.colors.primary[0],
+    color: "#FFF",
+    fontSize: $theme.sizing[3],
+    padding: $theme.sizing[1]
+  }));
+
+  return (
+    <ThemeProvider>
+      <Button>Button</Button>
+    </ThemeProvider>
+  );
+};
+```
+
+[createStyled](/api#createstyled) is a utility function provided by `styletron-react` so you can create your own styled function.
+
+We are accessing the `THEME` through React Context and passing it as the `$theme` prop so every `StyledComponent` (aka component using our new `styled` function) can use it.
+
+Finally, we need to wrap the root of our application with `ThemeProvider` so the `THEME` constant is passed to the whole React tree. If we wanted to enable switching between multiple themes, we could place the related logic into `ThemeProvider` component.

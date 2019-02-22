@@ -4,8 +4,10 @@ import {
   styled,
   withStyle,
   withStyleDeep,
-  withTransform
+  withTransform,
+  createStyled
 } from "styletron-react";
+import { driver, getInitialStyle } from "styletron-standard";
 
 const Editable = styled("div", {
   position: "relative",
@@ -21,7 +23,7 @@ const Editable = styled("div", {
   }
 });
 
-const FILTERED = [/^import.*/gi, "export", "default"];
+const FILTERED = [/^import.*/gim, "export", "default"];
 
 const transformCode = code =>
   FILTERED.reduce((acc, token) => acc.replace(token, ""), code);
@@ -36,7 +38,10 @@ const Code = ({ code }) => (
       withStyle,
       withStyleDeep,
       withTransform,
-      useHover
+      useHover,
+      createStyled,
+      driver,
+      getInitialStyle
     }}
   >
     <Editable>editable</Editable>
