@@ -12,7 +12,9 @@ export default Layout;
 4. [`$as` prop](#as-prop)
 5. [`$ref` prop](#ref-prop)
 6. [Composing Styles](#composing-styles)
-7. [Themes](#themes)
+7. [displayName](#displayname)
+8. [Themes](#themes)
+9. [Testing](#testing)
 
 ## Motivation
 
@@ -385,6 +387,41 @@ const Button = styled('button', props => ({
 
 It's more verbose but you will end up with a single component `Button` that doesn't rely on internal styles. In the future, you can decide to replace `color` by `backgroundColor` and it will not break "withStyled" components.
 
+## displayName
+
+> The displayName string is used in debugging messages. Usually, you don’t need to set it explicitly because it’s inferred from the name of the function or class that defines the component. You might want to set it explicitly if you want to display a different name for debugging purposes or when you create a higher-order component, see Wrap the Display Name for Easy Debugging for details.
+
+Since **`styled` is technically a higher-order component**, we need to set the `displayName` explicitly to see the real component names when debugging (or snapshot testing). If you are tired of doing this manually, we provide `babel-plugin-transform-styletron-display-name` that will do this for you!
+
+```bash
+yarn add babel-plugin-transform-styletron-display-name
+```
+
+Add this plugin into your `.babelrc`:
+
+```json
+{
+  "plugins": ["babel-plugin-transform-styletron-display-name"]
+}
+```
+
+The plugin takes this code
+
+```js
+const Foo = styled("div", {
+  color: "red"
+});
+```
+
+and transforms it into
+
+```js
+Foo = styled("div", {
+  color: "red"
+});
+Foo.displayName = "Foo";
+```
+
 ## Themes
 
 You probably want to keep colors or sizing consistent across various components. A good practice is to keep these values defined in a single location so you can change them globally. You could create a module for this purpose:
@@ -475,3 +512,11 @@ export default () => {
 We are accessing the `THEME` through React Context and passing it as the `$theme` prop so every `StyledComponent` (aka component using our new `styled` function) can use it.
 
 Finally, we need to wrap the root of our application with `ThemeProvider` so the `THEME` constant is passed to the whole React tree. If we wanted to enable switching between multiple themes, we could place the related logic into `ThemeProvider` component.
+
+## Testing
+
+You can test styled components as any other React component. Just don't forget to wrap the tested component with `StyletronProvider`!
+
+One popular approach is [snapshot testing](https://jestjs.io/docs/en/snapshot-testing). You can emit (render) the HTML markup, save it into a file and diff it on the next run. This will prevent unwanted changes in the component's output.
+
+**With Styletron, you can take this approach one step further**. Your styles live in JavaScript too, so you can add them to your snapshots and capture both HTML and CSS output. This will require some setup.
