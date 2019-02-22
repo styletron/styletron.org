@@ -515,8 +515,47 @@ Finally, we need to wrap the root of our application with `ThemeProvider` so the
 
 ## Testing
 
-You can test styled components as any other React component. Just don't forget to wrap the tested component with `StyletronProvider`!
+You can test styled components as any other React component. Just don't forget to wrap the tested component with Styletron's `Provider`!
 
 One popular approach is [snapshot testing](https://jestjs.io/docs/en/snapshot-testing). You can emit (render) the HTML markup, save it into a file and diff it on the next run. This will prevent unwanted changes in the component's output.
 
-**With Styletron, you can take this approach one step further**. Your styles live in JavaScript too, so you can add them to your snapshots and capture both HTML and CSS output. This will require some setup.
+**With Styletron you can take this approach one step further**. Your styles live in JavaScript now, so you can extract them into a single string and add them to your snapshots. If you use [Jest](https://jestjs.io/) and [react-test-renderer](https://reactjs.org/docs/test-renderer.html) ([Enzyme](https://airbnb.io/enzyme/) would work too!), you could do something like this:
+
+```jsx
+import React from "react";
+import renderer from "react-test-renderer";
+import { styled, Provider } from "styletron-react";
+import { Server } from "styletron-engine-atomic";
+
+// tested component
+const Button = styled("button", {
+  color: "red"
+});
+
+test("Button", () => {
+  const styletron = new Server();
+  const component = renderer.create(
+    <Provider value={styletron}>
+      <Button>Text</Button>
+    </Provider>
+  );
+  expect(styletron.getCss()).toMatchSnapshot("CSS");
+  expect(component.toJSON()).toMatchSnapshot("HTML");
+});
+```
+
+This creates two snapshots:
+
+```text
+exports[`Button: CSS 1`] = `".ae{color:red}"`;
+
+exports[`Button: HTML 1`] = `
+<button
+  className="ae"
+>
+  Text
+</button>
+`;
+```
+
+We captured **both the HTML markup and related CSS**.

@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button: CSS 1`] = `".ae{color:red}"`;
+
+exports[`Button: HTML 1`] = `
+<button
+  className="ae"
+>
+  Text
+</button>
+`;
