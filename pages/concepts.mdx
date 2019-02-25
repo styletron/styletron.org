@@ -282,7 +282,7 @@ Do you need to use `@font-face`? Styletron provides a declarative way to do it. 
 ```css
 @font-face {
   font-family: "Laila";
-  src: url("./static/Laila.ttf");
+  src: url("https://styletron.netlify.com/static/Laila.ttf");
 }
 
 .font-laila {
@@ -298,7 +298,7 @@ import { styled } from "styletron-react";
 export default () => {
   const FontLaila = styled("div", {
     fontFamily: {
-      src: "url(./static/Laila.ttf)"
+      src: "url(https://styletron.netlify.com/static/Laila.ttf)"
     }
   });
   return <FontLaila>This is Laila font.</FontLaila>;
