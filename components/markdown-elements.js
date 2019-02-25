@@ -53,9 +53,11 @@ const getText = children => {
   return label;
 };
 
+export const cleanAnchor = anchor => slugify(getText(anchor));
+
 const Heading = ({ element, children }) => {
   const [hoverRef, isHovered] = useHover();
-  const slug = slugify(getText(children));
+  const slug = cleanAnchor(children);
   return React.createElement(
     element,
     { ref: hoverRef, id: slug },

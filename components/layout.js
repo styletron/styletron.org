@@ -5,6 +5,8 @@ import Link from "next/link";
 import { styled } from "styletron-react";
 import { MOBILE_BREAKPOINT, ROUTES } from "../const";
 import Navigation, { getATarget } from "./navigation";
+import { cleanAnchor } from "./markdown-elements";
+import schd from "../helpers/schd";
 
 import MarkdownElements from "./markdown-elements";
 
@@ -79,14 +81,46 @@ const PrevNextLinks = styled("div", {
 });
 
 class Layout extends React.Component {
+  constructor(props) {
+    super(props);
+    this.debouncedOnScroll = schd(this.onScroll);
+  }
+
   state = {
-    sidebarVisible: false
+    sidebarVisible: false,
+    activeAnchor: Array.isArray(ROUTES[this.getPathIndex()].anchors)
+      ? ROUTES[this.getPathIndex()].anchors[0]
+      : null
   };
-  render() {
-    const pathIndex = ROUTES.findIndex(
+  componentDidMount() {
+    if (Array.isArray(ROUTES[this.getPathIndex()].anchors)) {
+      document.addEventListener("scroll", this.debouncedOnScroll);
+      this.onScroll();
+    }
+  }
+  componentWillUnmount() {
+    document.removeEventListener("scroll", this.debouncedOnScroll);
+  }
+  onScroll = () => {
+    const pathIndex = this.getPathIndex();
+    const anchors = ROUTES[pathIndex].anchors;
+    let activeAnchor = anchors[0];
+    anchors.forEach(anchor => {
+      const el = document.getElementById(cleanAnchor(anchor));
+      if (el.getBoundingClientRect().top - 26 < 0) {
+        activeAnchor = anchor;
+      }
+    });
+    this.setState({ activeAnchor });
+  };
+  getPathIndex() {
+    return ROUTES.findIndex(
       route =>
         route.path.replace(/\//g, "") === this.props.path.replace(/\//g, "")
     );
+  }
+  render() {
+    const pathIndex = this.getPathIndex();
     const prevRoute = pathIndex > 0 ? pathIndex - 1 : -1;
     const nextRoute =
       pathIndex > -1 && pathIndex < ROUTES.length - 1 ? pathIndex + 1 : -1;
@@ -117,6 +151,7 @@ class Layout extends React.Component {
                 <div />
               )}
             </PrevNextLinks>
+            <div style={{ height: "600px" }} />
           </Content>
           <Sidebar>
             <SidebarButtonWrap>
@@ -134,6 +169,7 @@ class Layout extends React.Component {
             <Navigation
               isVisible={this.state.sidebarVisible}
               pathIndex={pathIndex}
+              activeAnchor={this.state.activeAnchor}
             />
           </Sidebar>
         </TwoColumnLayout>

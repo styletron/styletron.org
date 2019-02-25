@@ -2,11 +2,15 @@ import * as React from "react";
 import Link from "next/link";
 import { styled } from "styletron-react";
 import { MOBILE_BREAKPOINT, ROUTES } from "../const";
+import { cleanAnchor } from "./markdown-elements";
 
-const SidebarItem = styled("li", {
-  padding: "0.75em 2em 0.75em 2em",
-  fontSize: "1em"
-});
+const SidebarItem = styled("li", ({ $anchor, $active }) => ({
+  padding: $anchor
+    ? "0rem 2rem 0.75rem 3rem"
+    : `0.75rem 2rem ${$active ? "0.5rem" : "0.75rem"} 2rem`,
+  fontSize: $anchor ? "14px" : "16px",
+  width: "8em"
+}));
 
 const StyledLink = styled("a", ({ $active }) => ({
   fontWeight: $active ? "bold" : "normal",
@@ -35,19 +39,32 @@ const SidebarList = styled("ul", ({ $isVisible }) => ({
 export const getATarget = route =>
   route === "https://github.com/styletron/styletron" ? "_blank" : undefined;
 
-const Navigation = ({ isVisible, pathIndex }) => (
+const Navigation = ({ isVisible, pathIndex, activeAnchor }) => (
   <SidebarList $isVisible={isVisible}>
     {ROUTES.map((route, index) => (
-      <SidebarItem key={route.path}>
-        <Link href={route.path} prefetch>
-          <StyledLink
-            target={getATarget(route.path)}
-            $active={pathIndex === index}
-          >
-            {route.text}
-          </StyledLink>
-        </Link>
-      </SidebarItem>
+      <React.Fragment key={route.path}>
+        <SidebarItem $active={pathIndex === index}>
+          <Link href={route.path} prefetch>
+            <StyledLink
+              target={getATarget(route.path)}
+              $active={pathIndex === index}
+            >
+              {route.text}
+            </StyledLink>
+          </Link>
+        </SidebarItem>
+        {pathIndex === index &&
+          ROUTES[pathIndex].anchors.map(anchor => (
+            <SidebarItem key={anchor} $anchor>
+              <StyledLink
+                href={`#${cleanAnchor(anchor)}`}
+                $active={activeAnchor === anchor}
+              >
+                {anchor}
+              </StyledLink>
+            </SidebarItem>
+          ))}
+      </React.Fragment>
     ))}
   </SidebarList>
 );

@@ -10,7 +10,7 @@ export const ROUTES = [
       "With Fusion.js",
       "With Next.js",
       "With Gatsby",
-      "With JavaScript "
+      "With JavaScript"
     ]
   },
   {
@@ -34,7 +34,7 @@ export const ROUTES = [
     anchors: [
       "Style Object",
       "Style Function",
-      "Media Queries and Pseduo Classes",
+      "Media Queries And Pseudo Classes",
       "Selectors",
       "Fonts",
       "Keyframes",
