@@ -88,9 +88,11 @@ class Layout extends React.Component {
 
   state = {
     sidebarVisible: false,
-    activeAnchor: Array.isArray(ROUTES[this.getPathIndex()].anchors)
-      ? ROUTES[this.getPathIndex()].anchors[0]
-      : null
+    activeAnchor:
+      ROUTES[this.getPathIndex()] &&
+      Array.isArray(ROUTES[this.getPathIndex()].anchors)
+        ? ROUTES[this.getPathIndex()].anchors[0]
+        : null
   };
   componentDidMount() {
     if (Array.isArray(ROUTES[this.getPathIndex()].anchors)) {
