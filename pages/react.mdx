@@ -18,7 +18,7 @@ export default Layout;
 
 ## Motivation
 
-**React components are independent and reusable pieces of UI**. They accept props and return a description of what should appear on the screen - typically, in a form of HTML markup. For long time, the styles were left outside of React components and handled by different means. You probably wrote or saw this code before:
+**React components are independent and reusable pieces of UI**. They accept props and return a description of what should appear on the screen - typically, in the form of HTML markup. For long time, the styles were left outside of React components and handled by different means. You probably wrote or saw this code before:
 
 ```jsx live
 class MyApp extends React.Component {
@@ -43,7 +43,7 @@ class MyApp extends React.Component {
 }
 ```
 
-It is pretty clear that `MyApp` renders a button that can be in active or inactive state. **What's not clear is the button's appearance**. It applies `.btn` and `.btn-active` CSS classes but we don't know where those classes are defined, what rules they contain and what the overall import/build process is. Suddenly, our encapsulated piece of UI heavily relies on a code that lives outside of it. **Our component lost its independence and isolation**. We can't just simply copy&paste it into a different project and expect it to work. **It's not portable anymore**.
+It is pretty clear that `MyApp` renders a button that can be in active or inactive state. **What's not clear is the button's appearance**. It applies `.btn` and `.btn-active` CSS classes but we don't know where those classes are defined, what rules they contain and what the overall import/build process is. Suddenly, our encapsulated piece of UI heavily relies on a code that lives outside of it. **Our component lost its independence and isolation**. We can't just simply copy & paste it into a different project and expect it to work. **It's not portable anymore**.
 
 To make it even more awkward, **the component state should directly control the button's appearance or what CSS rules are applied**. _When the button is active, its background should be blue_. We have to toggle class names and glue together the `className` prop. It gets even less readable if there are multiple states.
 
@@ -51,11 +51,11 @@ To make it even more awkward, **the component state should directly control the 
 className={`btn ${isActive ? "btn-active" : ""}`}
 ```
 
-We call this concept **dynamic styling**. It happens when we need to map `props` and `state` directly into the resulting styles. This is very hard with classic CSS since you cannot easily pass variables from JavaScript to CSS.
+We call this concept **dynamic styling**. It happens when we need to map `props` and `state` directly into the resulting styles. This is difficult with classic CSS since you cannot easily pass variables from JavaScript to CSS.
 
-_Side note: CSS modules partly addresses some of these concerns but still requires an extra tooling and their portability story is generally weak._
+_Side note: CSS modules partly addresses some of these concerns but requires extra tooling and does not lead to portable code._
 
-Things are looking grim so far. But what if I told you that **we can solve all those issues by using inline styles**?
+Things are looking grim so far. What if I told you **we can solve enable dynamic styling and support portability by using inline styles**?
 
 ```jsx live
 class MyApp extends React.Component {
@@ -87,7 +87,7 @@ class MyApp extends React.Component {
 }
 ```
 
-All styles are now encapsulated in the component. We can clearly see what rules are being used. We don't have to worry about a special build process. **Oh, and no `className` joggling either - we don't even have classNames now!** But, inline styles have some very serious limitations: For example, you can't use pseudo selectors like `:hover` or media queries.
+All styles are now encapsulated in the component. We can clearly see what rules are being used. We don't have to worry about a special build process. **Oh, and no `className` manipulation either - we don't even have classNames now!** But, inline styles have some very serious limitations: For example, you can't use pseudo selectors like `:hover` or media queries.
 
 If there was only a way how to get the best of both worlds. 🤔
 
@@ -95,7 +95,7 @@ If there was only a way how to get the best of both worlds. 🤔
 
 ## Styled Components
 
-**Styletron provides APIs and developer experience similar to inline styles but without any drawbacks**. Let's do the button example again but this time with Styletron:
+**Styletron provides APIs and developer experience similar to inline styles but without any drawbacks**. Let's repeat the button example again but this time with Styletron:
 
 ```jsx live
 import { styled } from "styletron-react";
@@ -133,7 +133,7 @@ class MyApp extends React.Component {
 }
 ```
 
-It looks somewhat similar to the inline style example. The styles are still defined inside of the component; however, this time we are doing an extra step - **we are creating a styled component with the `styled` function**.
+It looks somewhat similar to the inline style example. The styles are still defined inside of the component; however, this time **we create a styled component with the `styled` function**.
 
 The `styled` function expects two arguments:
 
@@ -509,7 +509,7 @@ export default () => {
 
 [createStyled](/api#createstyled) is a utility function provided by `styletron-react` so you can create your own styled function.
 
-We are accessing the `THEME` through React Context and passing it as the `$theme` prop so every `StyledComponent` (aka component using our new `styled` function) can use it.
+We are accessing the `THEME` through React Context and passing it as the `$theme` prop so every `Styled Component` (aka component using our new `styled` function) can use it.
 
 Finally, we need to wrap the root of our application with `ThemeProvider` so the `THEME` constant is passed to the whole React tree. If we wanted to enable switching between multiple themes, we could place the related logic into the `ThemeProvider` component.
 

@@ -4,7 +4,7 @@ export default Layout;
 
 # Concepts
 
-CSS in JS is not just about _throwing_ some CSS into `.js` files. **CSS in JS comes with a different philosophy**. You can still use the most of CSS constructs but there are some quirks and limitations when a different approach is required. Those restrictions are not necessarily bad but it can be certainly frustrating if you are not aware of them. This page aims to answer most of the "_How to do x in Styletron_" questions and suggest some good practices.
+CSS in JS is not just about _throwing_ some CSS into `.js` files. **CSS in JS comes with a different approach**. You can still use most of the CSS constructs you are familiar with but there are some quirks and limitations when a different approach is required. Those restrictions are not necessarily bad but it can be certainly frustrating if you are not aware of them. This page aims to answer most of the "_How to do x in Styletron_" questions and suggest some good practices.
 
 Most of the concepts described bellow are not React specific but we still use React and `styletron-react` to demonstrate them.
 
@@ -125,11 +125,11 @@ const styles = {
 
 ## Selectors
 
-One of the premises of CSS in JS is keeping all styles local, isolated and avoiding any [specificity shenanigans](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity). It is probably the most controversial thing about CSS in JS since it requires a significant mind shift and using other patterns.
+One of the primary benefits of CSS in JS is that it keeps styles encapsulated with markup and avoids [specificity concerns](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity). It is probably the most controversial thing about CSS in JS since it requires an alternative approach from other patterns.
 
 **Styletron doesn't support [simple selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors#Simple_selectors) and [combinators](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors#Combinators). You can still use [pseudo-classes](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes) and [pseudo-elements](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements).**
 
-CSS is a powerful language and **many complex selectors and combinators just don't fit into CSS in JS model well**. There are definitely valid cases when things like descedant combinators can be used and we have been exploring a [possible API](https://github.com/styletron/styletron/issues/229) for that.
+CSS is a powerful language and **many complex selectors and combinators just don't fit into CSS in JS model well**. There are definitely valid cases when things like descedant combinators can be used, and we have been exploring a [possible API](https://github.com/styletron/styletron/issues/229) for that.
 
 For now, there are some workarounds for common cases that we recommend to use. However, if you are trying to implement something like this:
 
