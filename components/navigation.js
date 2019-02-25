@@ -45,10 +45,11 @@ const Navigation = ({ isVisible, pathIndex, activeAnchor }) => (
     {ROUTES.map((route, index) => (
       <React.Fragment key={route.path}>
         <SidebarItem $active={pathIndex === index}>
-          <Link href={route.path} prefetch>
+          <Link href={route.path} prefetch={!route.path.includes("http")}>
             <StyledLink
               target={getATarget(route.path)}
               $active={pathIndex === index}
+              href={route.path}
             >
               {route.text}
             </StyledLink>
