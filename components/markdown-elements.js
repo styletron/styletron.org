@@ -77,13 +77,11 @@ export default {
   blockquote: ({ children }) => <Blockquote>{children}</Blockquote>,
   a: ({ children, href }) => {
     const parts = href.split("#");
-    const target =
-      (parts[0] === "" && parts[1] !== "") || !href.includes("http")
-        ? undefined
-        : "_blank";
+    const internal =
+      (parts[0] === "" && parts[1] !== "") || !href.includes("http");
     return (
-      <Link href={href} prefetch>
-        <a target={target}>{children}</a>
+      <Link href={href} prefetch={internal}>
+        <a target={internal ? undefined : "_blank"}>{children}</a>
       </Link>
     );
   },
