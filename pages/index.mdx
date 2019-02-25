@@ -6,7 +6,7 @@ export default Layout;
 
 <Logo />
 
-**Styletron is an universal toolkit for component-oriented styling**. It falls into the [CSS in JS](https://github.com/tuchk4/awesome-css-in-js) category. Styletron works great with [React](https://reactjs.org/) but can be used with any other framework or plain JS as well.
+**Styletron is an universal toolkit for component-oriented styling**. It falls into the [CSS in JS](https://github.com/tuchk4/awesome-css-in-js) category. Styletron works great with [React](https://reactjs.org/) but can be used with other frameworks or plain JS as well.
 
 [Looking for v3 docs](https://styletron.netlify.com/v3/) or [v3 to v4 migration guide](https://github.com/styletron/styletron/blob/master/docs/v3-migration-guide.md)?
 
@@ -48,7 +48,7 @@ Styletron provides [styletron-react](https://www.npmjs.com/package/styletron-rea
 </html>
 ```
 
-Styletron processes the style object and creates two atomic classes. **The class names are auto-generated**. So you don't have to worry about the [naming methodologies](http://getbem.com/introduction/)! **That's great!** What's less great? The generated names are not stable and will change all the time so you should never target them. If you need a stable selector for something as e2e tests, you should add `data-test-id` attribute.
+Styletron processes the style object and creates two atomic classes. **The class names are auto-generated**. So you don't have to worry about [naming methodologies](http://getbem.com/introduction/)! **That's great!** What's less great? The generated names are not stable and will change all the time so you should never target them. If you need a stable selector for something as e2e tests, you should add `data-test-id` attribute.
 
 Since Styletron uses the `<style />` tag, you can use **media queries** and other selectors as well. You could not do that with inline styles! Check [Concepts](/concepts) for more information about how classic CSS translates into CSS in JS.
 
@@ -58,13 +58,13 @@ Finally, the `Anchor` component is created and its `className` prop is set to `"
 
 ### Performance
 
-**Styletron generates styles only when absolutely needed**. This concept is also known as [critical rendering path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/). This means that your browser never needs to process CSS rules that are not being used. Styletron does the declaration-level de-duplication known as [Atomic CSS](https://acss.io/). **It dramatically reduces the redundancy of CSS rules**. Also, Styletron is pretty compact and will add less than 8kB (gzip) to your bundle.
+**Styletron generates styles only when absolutely needed**. This concept is also known as [critical rendering path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/). This means that your browser never needs to process CSS rules that are not being used. Styletron does declaration-level de-duplication known as [Atomic CSS](https://acss.io/). **It dramatically reduces the redundancy of CSS rules**. Also, Styletron is pretty compact and will add less than 8kB (gzip) to your bundle.
 
 ### No extra tooling required
 
 If you want to make sure that your CSS scales well with the size of application, you might need to reach for some additional tooling. For example, a comparable approach called [CSS Modules](https://github.com/css-modules/css-modules) requires you to use Webpack and its [css-loader](https://github.com/webpack-contrib/css-loader). To improve the developer experience even further, many projects also rely on post/pre-processing with [PostCSS](https://github.com/postcss/postcss) or [SASS](https://sass-lang.com/).
 
-On the other hand, using Styletron means adding just an additional NPM module into your project. **It doesn't require any specific compiler, bundler or complicated setup**.
+On the other hand, using Styletron means adding just an additional NPM module into your project. **It doesn't require a specific compiler or bundler setup**.
 
 ### Portability
 
