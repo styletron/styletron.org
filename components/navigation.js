@@ -27,6 +27,7 @@ const SidebarList = styled("ul", ({ $isVisible }) => ({
   borderLeft: "5px solid #FFC043",
   [MOBILE_BREAKPOINT]: {
     display: $isVisible ? "block" : "none",
+    padding: "0.5em 0em",
     position: "absolute",
     width: "15em",
     right: "-6px",
