@@ -140,7 +140,7 @@ The `styled` function expects two arguments:
 - **Element type** - What underlying DOM element should be used. In our case, we chose `button`.
 - **Style function / object** - To describe the styles. It can be a plain style object or a function that returns a style object. The function gets `props`. That's useful if your styles need to be dynamic (derived from `props`).
 
-For styling properties, we use camelCase and there are some other subtle differences described in [Concepts](/concept). We can also now use pseudo classes as `:hover`. **The inline styles limitations don't apply anymore!**
+For styling properties, we use camelCase and there are some other subtle differences described in [Concepts](/concepts). We can also now use pseudo classes as `:hover`. **The inline styles limitations don't apply anymore!**
 
 Once the styled component is created, we can render it as any other React component. **We don't need to set `style` or `className` prop**. The styled component already does that for us on the background - Styletron creates a bunch of CSS classes and "glues" them to the `<button />` element. Check the [Home page example](/#example) for more details.
 
