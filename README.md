@@ -1,4 +1,4 @@
-# [styletron.js.org](https://styletron.js.org)
+# [styletron.org](https://www.styletron.org)
 
 Documentation website for Styletron.
 
