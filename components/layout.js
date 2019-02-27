@@ -21,8 +21,8 @@ const BurgerWrap = styled("div", {
   backgroundColor: "#fff",
   borderRadius: "5em",
   padding: "0.75em",
-  marginRight: "-0.5em",
-  marginTop: "-1em",
+  marginRight: "-0.75em",
+  marginTop: "-1.25em",
   cursor: "pointer",
   boxShadow: "rgba(0, 0, 0, 0.3) 0 2px 10px"
 });

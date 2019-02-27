@@ -279,7 +279,7 @@ pre[class*="language-"]:after {
   .react-live > pre,
   .react-live-error,
   pre[class*="hljs"] {
-    width: 80vw;
+    width: 85vw;
   }
 }
 
@@ -287,7 +287,7 @@ pre[class*="language-"]:after {
   .react-live > pre,
   .react-live-error,
   pre[class*="hljs"] {
-    width: 75vw;
+    width: 80vw;
   }
 }
 

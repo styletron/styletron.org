@@ -14,7 +14,7 @@ const Content = styled("div", {
   justifyContent: "center",
   padding: "6em 1.5em",
   [MOBILE_BREAKPOINT]: {
-    padding: "2em 1.5em"
+    padding: "1.5em 0.75em"
   }
 });
 

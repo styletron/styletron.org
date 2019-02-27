@@ -282,7 +282,7 @@ Do you need to use `@font-face`? Styletron provides a declarative way to do it. 
 ```css
 @font-face {
   font-family: "Laila";
-  src: url("./static/Laila.ttf");
+  src: url("/static/Laila.ttf");
 }
 
 .font-laila {
@@ -298,7 +298,7 @@ import { styled } from "styletron-react";
 export default () => {
   const FontLaila = styled("div", {
     fontFamily: {
-      src: "url(./static/Laila.ttf)"
+      src: "url(/static/Laila.ttf)"
     }
   });
   return <FontLaila>This is Laila font.</FontLaila>;
@@ -312,13 +312,10 @@ CSS offers a powerful animation API `@keyframes`. Styletron provides a declarati
 ```css
 @keyframes move {
   from {
-    margin-left: 80%;
-    width: 300%;
+    margin-left: "150px";
   }
-
   to {
-    margin-left: 0%;
-    width: 100%;
+    margin-left: "0px";
   }
 }
 
@@ -340,12 +337,10 @@ export default () => {
     animationIterationCount: "infinite",
     animationName: {
       from: {
-        marginLeft: "80%",
-        width: "300%"
+        marginLeft: "150px"
       },
       to: {
-        marginLeft: "0%",
-        width: "100%"
+        marginLeft: "0px"
       }
     }
   });
