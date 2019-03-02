@@ -1,7 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { styled } from "styletron-react";
-import { MOBILE_BREAKPOINT, ROUTES } from "../const";
+import { DESKTOP_BREAKPOINT, ROUTES } from "../const";
 import { cleanAnchor } from "./markdown-elements";
 
 const SidebarItem = styled("li", ({ $anchor, $active }) => ({
@@ -20,20 +20,26 @@ const StyledLink = styled("a", ({ $active }) => ({
 }));
 
 const SidebarList = styled("ul", ({ $isVisible }) => ({
+  display: $isVisible ? "block" : "none",
   backgroundColor: "#fff",
   listStyleType: "none",
   margin: 0,
-  padding: 0,
-  borderLeft: "5px solid #FFC043",
-  [MOBILE_BREAKPOINT]: {
-    display: $isVisible ? "block" : "none",
-    padding: "0.5em 0em",
-    position: "absolute",
-    width: "15em",
-    right: "-6px",
-    borderLeft: "none",
-    borderRadius: "6px",
-    boxShadow: "rgba(0, 0, 0, 0.3) 0 2px 10px"
+  padding: "0.5em 0em",
+  borderLeft: "none",
+  position: "absolute",
+  width: "15em",
+  right: "-6px",
+  borderRadius: "6px",
+  boxShadow: "rgba(0, 0, 0, 0.3) 0 2px 10px",
+  [DESKTOP_BREAKPOINT]: {
+    position: "static",
+    width: "auto",
+    right: 0,
+    boxShadow: "none",
+    borderRadius: 0,
+    display: "block",
+    padding: 0,
+    borderLeft: "5px solid #FFC043"
   }
 }));
 

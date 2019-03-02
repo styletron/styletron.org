@@ -1,11 +1,11 @@
 import { styled } from "styletron-react";
 
 const Wrapper = styled("div", {
-  marginTop: "0.23em",
-  maxWidth: "20em",
-  "@media screen and (max-width: 880px)": {
-    marginTop: "2em",
-    maxWidth: "12em"
+  marginTop: "2em",
+  maxWidth: "12em",
+  "@media screen and (min-width: 880px)": {
+    marginTop: "0.23em",
+    maxWidth: "20em"
   }
 });
 

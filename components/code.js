@@ -8,6 +8,7 @@ import {
   createStyled
 } from "styletron-react";
 import { driver, getInitialStyle } from "styletron-standard";
+import { DESKTOP_BREAKPOINT } from "../const";
 
 const Editable = styled("div", {
   position: "relative",
@@ -18,8 +19,9 @@ const Editable = styled("div", {
   textTransform: "uppercase",
   fontWeight: "bold",
   textAlign: "right",
-  "@media screen and (max-width: 600px)": {
-    visibility: "hidden"
+  visibility: "hidden",
+  [DESKTOP_BREAKPOINT]: {
+    visibility: "visible"
   }
 });
 

@@ -3,7 +3,7 @@ import Burger from "@animated-burgers/burger-squeeze";
 import { MDXProvider } from "@mdx-js/tag";
 import Link from "next/link";
 import { styled } from "styletron-react";
-import { MOBILE_BREAKPOINT, ROUTES } from "../const";
+import { DESKTOP_BREAKPOINT, ROUTES } from "../const";
 import Navigation, { getATarget } from "./navigation";
 import { cleanAnchor } from "./markdown-elements";
 import schd from "../helpers/schd";
@@ -11,10 +11,10 @@ import schd from "../helpers/schd";
 import MarkdownElements from "./markdown-elements";
 
 const Content = styled("div", {
-  marginTop: "-1.25em",
+  marginTop: "-5em",
   maxWidth: "37em",
-  [MOBILE_BREAKPOINT]: {
-    marginTop: "-5em"
+  [DESKTOP_BREAKPOINT]: {
+    marginTop: "-1.25em"
   }
 });
 const BurgerWrap = styled("div", {
@@ -28,18 +28,18 @@ const BurgerWrap = styled("div", {
 });
 
 const SidebarButtonWrap = styled("div", {
-  display: "none",
+  display: "flex",
   width: "100%",
   justifyContent: "flex-end",
   marginBottom: "1em",
   textAlign: "right",
-  [MOBILE_BREAKPOINT]: {
-    display: "flex"
+  [DESKTOP_BREAKPOINT]: {
+    display: "none"
   }
 });
 
 const SidebarButton = styled("button", {
-  display: "none",
+  display: "block",
   padding: "0.5em 2em",
   fontSize: "1em",
   font: "inherit",
@@ -47,30 +47,31 @@ const SidebarButton = styled("button", {
   cursor: "pointer",
   backgroundColor: "#276EF1",
   borderRadius: "6px",
-  [MOBILE_BREAKPOINT]: {
-    display: "block"
+  [DESKTOP_BREAKPOINT]: {
+    display: "none"
   }
 });
 
 const Sidebar = styled("div", {
   position: "sticky",
-  top: "2em",
-  marginLeft: "3em",
-  marginTop: "4.75em",
+  top: "2.5em",
+  right: "2em",
+  margin: 0,
   flexShrink: 0,
-  [MOBILE_BREAKPOINT]: {
-    margin: 0,
-    top: "2.5em",
-    right: "2em"
+  [DESKTOP_BREAKPOINT]: {
+    marginLeft: "3em",
+    marginTop: "4.75em",
+    top: "2em"
   }
 });
 
 const TwoColumnLayout = styled("div", {
   display: "flex",
-  alignItems: "flex-start",
-  [MOBILE_BREAKPOINT]: {
-    flexDirection: "column-reverse",
-    alignItems: "flex-end"
+  flexDirection: "column-reverse",
+  alignItems: "flex-end",
+  [DESKTOP_BREAKPOINT]: {
+    flexDirection: "row",
+    alignItems: "flex-start"
   }
 });
 

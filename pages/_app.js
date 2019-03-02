@@ -5,16 +5,16 @@ import { Provider as StyletronProvider, styled } from "styletron-react";
 import Router from "next/router";
 import { styletron } from "../helpers/styletron";
 import { trackPageView } from "../helpers/ga";
-import { MOBILE_BREAKPOINT } from "../const";
+import { DESKTOP_BREAKPOINT } from "../const";
 import "@animated-burgers/burger-squeeze/dist/styles.css";
 import "../main.css";
 
 const Content = styled("div", {
   display: "flex",
   justifyContent: "center",
-  padding: "6em 1.5em",
-  [MOBILE_BREAKPOINT]: {
-    padding: "1.5em 0.75em"
+  padding: "1.5em 0.75em",
+  [DESKTOP_BREAKPOINT]: {
+    padding: "6em 1.5em"
   }
 });
 
