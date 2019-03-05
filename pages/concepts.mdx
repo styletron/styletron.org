@@ -123,6 +123,8 @@ const styles = {
 };
 ```
 
+There is a [small caveat](#media-queries-order) regarding the order of media queries.
+
 ## Selectors
 
 One of the primary benefits of CSS in JS is that it keeps styles encapsulated with markup and avoids [specificity concerns](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity). It is probably the most controversial thing about CSS in JS since it requires an alternative approach from other patterns.
@@ -440,7 +442,45 @@ it's not clear if the `border-width` will be `5px` or `2px`. Why?
 
 The order is not deterministic. Also, Styletron splits each rule into a separate CSS class (Atomic CSS) and reuses same classes across multiple styled components. **So if some other component already uses the `borderWidth: '5px'`** rule and is mounted before the `Content` component, there is a great chance that **you will end up with `2px`** since the order of in which CSS classes are defined matters and Styletron adds them incrementally as components are being mounted.
 
-For the same reason, you should avoid overlapping media queries as well.
+### Media Queries Order
+
+Media queries have a similar ordering problem as [Shorthand And Longhand Properties](#shorthand-and-longhand-properties). The order of media query definitions matters. Imagine these two scenarios:
+
+```
+(min-width: 480px)
+(min-width: 600px)
+```
+
+and
+
+```
+(min-width: 600px)
+(min-width: 480px)
+```
+
+If your viewport has 700px, those definitions would yield different results since they both get matched but only the last rule wins. Fortunately, **Styletron (since `styletron-engine-atomic@v1.1.0`) is smart enough to automatically sort all used media queries in a [mobile-first fashion](https://github.com/dutchenkoOleg/sort-css-media-queries#mobile-first)**. What does it mean? If your style object is:
+
+```js
+{
+  color: 'red',
+  'screen and (min-width: 800px)': {
+    color: 'blue'
+  },
+  'screen and (min-width: 420px)': {
+    color: 'pink'
+  },
+}
+```
+
+Styletron will sort it as:
+
+```
+color: red
+screen and (min-width: 420px)
+screen and (min-width: 800px)
+```
+
+otherwise the `800px` query would never get used since the `420px` min-width query gets matched too and that's probably not what you would ever want. Since we can't sort mobile-first and desktop-first at the same time, Styletron does the mobile-first sorting by default. **Please, don't use the desktop-first approach. You will run into issues.**
 
 ### Quotes
 
