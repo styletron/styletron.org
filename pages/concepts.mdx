@@ -153,10 +153,6 @@ For this use-case, you can use [React.Children.map](https://reactjs.org/docs/rea
 
 ```jsx live
 export default () => {
-  // createContext should be module scoped
-  // and imported by Parent and Child
-  const ParentContext = React.createContext();
-
   const ButtonGroup = ({ children }) => {
     return React.Children.map(children, (child, index) =>
       React.cloneElement(child, { groupIndex: index })
