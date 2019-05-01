@@ -21,11 +21,13 @@ export const ROUTES = [
       "Styled Components",
       "Props Filtering",
       "$as prop",
-      "$ref prop",
+      "$style prop",
+      "Refs",
       "Composing Styles",
       "displayName",
       "Themes",
-      "Testing"
+      "Testing",
+      "useStyletron Hook (NEW)"
     ]
   },
   {
@@ -50,11 +52,11 @@ export const ROUTES = [
       "Server",
       "styled",
       "withStyle",
-      "withStyleDeep",
       "withTransform",
       "withWrapper",
       "Provider",
-      "createStyled"
+      "createStyled",
+      "useStyletron"
     ]
   },
   { text: "GitHub", path: "https://github.com/styletron/styletron" }

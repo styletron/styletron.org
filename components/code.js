@@ -3,9 +3,9 @@ import { useHover } from "./hooks";
 import {
   styled,
   withStyle,
-  withStyleDeep,
   withTransform,
-  createStyled
+  createStyled,
+  useStyletron
 } from "styletron-react";
 import { driver, getInitialStyle } from "styletron-standard";
 import { DESKTOP_BREAKPOINT } from "../const";
@@ -38,12 +38,12 @@ const Code = ({ code }) => (
     scope={{
       styled,
       withStyle,
-      withStyleDeep,
       withTransform,
       useHover,
       createStyled,
       driver,
-      getInitialStyle
+      getInitialStyle,
+      useStyletron
     }}
   >
     <Editable>editable</Editable>

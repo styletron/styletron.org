@@ -10,11 +10,13 @@ export default Layout;
 2. [Styled Components](#styled-components)
 3. [Props Filtering](#props-filtering)
 4. [`$as` prop](#as-prop)
-5. [`$ref` prop](#ref-prop)
-6. [Composing Styles](#composing-styles)
-7. [displayName](#displayname)
-8. [Themes](#themes)
-9. [Testing](#testing)
+5. [`$style` prop](#style-prop)
+6. [Refs](#refs)
+7. [Composing Styles](#composing-styles)
+8. [displayName](#displayname)
+9. [Themes](#themes)
+10. [Testing](#testing)
+11. [useStyletron Hook (NEW)](#usestyletron-hook-new)
 
 ## Motivation
 
@@ -187,51 +189,67 @@ The warning message above was manufactured since `$isActive` is filtered out by 
 
 This can be especially useful when you need to swap between `a` and `button` or `h1`, `h2`, `h3`. You don't need to create multiple styled components for that.
 
-## `$ref` prop
+## `$style` prop
 
-What are [React refs](https://reactjs.org/docs/refs-and-the-dom.html)?
+The `$style` property allows you to override styles directly on a styled component.
 
-> In the typical React dataflow, props are the only way that parent components interact with their children. To modify a child, you re-render it with new props. However, there are a few cases where you need to imperatively modify a child outside of the typical dataflow. The child to be modified could be an instance of a React component, or it could be a DOM element. For both of these cases, React provides an escape hatch.
-
-**Refs is an escape hatch so you can directly modify the instance of a React component**. For example, we have an input and button and we want to focus the input when the button is clicked:
+For example, we have some boring gray text.
+Let's make it beautiful by passing a `$style` override:
 
 ```jsx live
-class MyApp extends React.Component {
-  constructor() {
-    this.inputRef = React.createRef();
-  }
-  render() {
-    return (
-      <>
-        <input ref={this.inputRef} />
-        <button onClick={() => this.inputRef.current.focus()}>
-          Focus input
-        </button>
-      </>
-    );
-  }
-}
+() => {
+  const BoringText = styled("div", { color: "gray" });
+
+  return (
+    <>
+      <BoringText $style={{ color: "hotpink" }}>pretty in pink</BoringText>
+    </>
+  );
+};
 ```
 
-However, if `input` is not just a simple input but styled component `<Input />` this will not work:
+You can also pass `$style` a function for dynamic overriding based on props:
 
-```jsx
-import { styled } from "styletron-react";
+```jsx live
+() => {
+  const BoringText = styled("div", { color: "gray" });
 
-const Input = styled("input", { background: "#FFE1A5" });
-
-// …
-<Input ref={this.inputRef} />;
-// …
+  return (
+    <>
+      <BoringText
+        $style={props => ({ color: props.$special ? "hotpink" : "gray" })}
+        $special
+      >
+        pink panther
+      </BoringText>
+    </>
+  );
+};
 ```
 
-React will complain:
+`$style` also takes precendence over `withStyle`:
 
-> Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
+```jsx live
+() => {
+  const BoringText = styled("div", { color: "gray" });
+  const MostBoringText = withStyle(BoringText, { color: "dimgray" });
 
-**`styled` creates a function component** and not class based component. **Function components can't accept a ref**.
+  return (
+    <>
+      <MostBoringText $style={{ color: "hotpink" }}>
+        on wednesdays we wear pink
+      </MostBoringText>
+    </>
+  );
+};
+```
 
-React gives a great suggestion to library maintainers to forward refs with [React.forwardRef](https://reactjs.org/docs/forwarding-refs.html) API. This is a fairly new feature (React v16.3). Styletron [will most likely adopt it](https://github.com/styletron/styletron/issues/253) in the next major version. In meantime, Styletron provides an alternative ref forwarding scheme through the `$ref` prop:
+## Refs
+
+When you use a `ref` on a styled component it will be forwarded to the underlying element.
+
+For example, we have a styled input and a button.
+We want to focus the input when the button is clicked:
 
 ```jsx live
 import { styled } from "styletron-react";
@@ -244,7 +262,7 @@ class MyApp extends React.Component {
     const Input = styled("input", { background: "#FFE1A5" });
     return (
       <>
-        <Input $ref={this.inputRef} />
+        <Input ref={this.inputRef} />
         <button onClick={() => this.inputRef.current.focus()}>
           Focus input
         </button>
@@ -254,138 +272,118 @@ class MyApp extends React.Component {
 }
 ```
 
-**Just rename `ref` to `$ref`**. That's it!
+As expected, `this.inputRef` is forwarded to the underlying `input`.
+
+Previous versions of Styletron required refs to be passed using a `$ref` property.
+As of Styletron `v5` this work-around is no longer neccessary (thanks to `React.forwardRef`).
+
+[See here for more info on React Refs](https://reactjs.org/docs/refs-and-the-dom.html).
 
 ## Composing Styles
 
-Styled components are quite locked down. They come with defined styles and underlying DOM element. You can swap the DOM element with the [`$as` prop](#as-prop) but **what if you want to tweak some styles** as well?
+As you use Styletron you may eventually run into some fundamental questions:
 
-`styletron-react` exports several composition functions. These can be used to create new styled components by composing styles from existing ones. You don't need to create a new component from scratch. Perfect for tweaks!
+- How do I tweak a few styles on a styled component?
+- How do I reuse styles across multiple components?
 
-### withStyle
+Styletron offers a few strategies:
 
-Do you need to slightly modify an existing styled component like changing the color?
+1. Use the [`$style` prop](#style-prop) for direct component style overrides
+2. Compose existing styled component using the `withStyle` function
+3. Use props (`$type`, `$isActive`, etc) to allow customization of styled components
+
+Here are a few scenarios that map to these strategies:
+
+### Tweaks
+
+If you only need a slight modification to an existing styled component and reuse is not a concern, look no further than the [`$style` prop](#style-prop):
+
+```jsx live
+() => {
+  const Button = styled("button", {
+    color: "black",
+    border: "solid 1px currentColor"
+  });
+
+  return (
+    <>
+      <Button>Button</Button>
+      <Button $style={{ color: "red" }}>Button</Button>
+    </>
+  );
+};
+```
+
+### Reusing Styled Components
+
+If you want to reuse modifications to a styled component, consider the `withStyle` function, which returns a new styled component:
 
 ```jsx live
 import { withStyle, styled } from "styletron-react";
 
 export default () => {
-  const RedButton = styled("button", {
-    color: "red",
-    border: "2px solid black",
-    display: "block",
-    margin: "1em 0"
+  const Button = styled("button", {
+    color: "black",
+    border: "solid 1px currentColor"
   });
-  const BlueButton = withStyle(RedButton, { color: "blue" });
+  const BlueButton = withStyle(Button, { color: "blue" });
+
   return (
     <>
-      <RedButton>Red Button</RedButton>
+      <Button>Button</Button>
       <BlueButton>Blue Button</BlueButton>
     </>
   );
 };
 ```
 
-**`BlueButton` overrides the `color` property** but keeps other `RedButton`'s styles intact. This is especially useful if you don't own the `RedButton` component and you can't change its API (adding `$isBlue` prop?).
+**`BlueButton` overrides the `color` property** but keeps other `Button` styles intact.
+This is especially useful if you don't own the `Button` component and you can't change its API (by adding an `$isBlue` prop for example).
 
-### withStyleDeep
+### Expanding a styled component's API
 
-The style object can be nested when pseudo classes (`:hover`, `:focus`, etc.) are used. The problem is that `withStyle` blindly overrides only the first level:
+`withStyle` is a powerful tool but you should avoid over-using it.
+Oftentimes, it is better to update the original component and add some additional props to it.
 
-```jsx live
-import { withStyle, styled } from "styletron-react";
-
-export default () => {
-  const HoverRed = styled("button", {
-    ":hover": {
-      color: "red",
-      border: "2px dashed black"
-    },
-    border: "2px solid black",
-    display: "block",
-    margin: "1em 0"
-  });
-  const HoverBlue = withStyle(HoverRed, {
-    ":hover": {
-      color: "blue"
-    }
-  });
-  return (
-    <>
-      <HoverRed>Hover Red Button</HoverRed>
-      <HoverBlue>Hover Blue Button</HoverBlue>
-    </>
-  );
-};
-```
-
-`HoverBlue` gets blue when hovered but it doesn't have the dashed border anymore. That's because `withStyle` replaced the whole `:hover` property and _didn't look inside_. To fix that, you can use `withStyleDeep` instead:
-
-```jsx live
-import { withStyleDeep, styled } from "styletron-react";
-
-export default () => {
-  const HoverRed = styled("button", {
-    ":hover": {
-      color: "red",
-      border: "2px dashed black"
-    },
-    border: "2px solid black",
-    display: "block",
-    margin: "1em 0"
-  });
-  const HoverBlue = withStyleDeep(HoverRed, {
-    ":hover": {
-      color: "blue"
-    }
-  });
-  return (
-    <>
-      <HoverRed>Hover Red Button</HoverRed>
-      <HoverBlue>Hover Blue Button</HoverBlue>
-    </>
-  );
-};
-```
-
-`:hover` object is now deeply merged and `HoverBlue` preserves the dashed border style.
-
-#### Note
-
-`withStyle` and `withStyleDeep` are powerful functions but you should avoid over-using them. Often times, it's better to update the original component and add some additional props to it. For example, instead of
+For example, instead of:
 
 ```jsx
 const PrimaryButton = withStyle(Button, { color: "blue" });
-const SecondaryButton = withStyle(Button, { color: "green" });
-const TertiaryButton = withStyle(Button, { color: "yellow" });
+const SecondaryButton = withStyle(Button, { color: "turquoise" });
+const TertiaryButton = withStyle(Button, { color: "purple" });
 ```
 
-it might be better to add `type` property to the `Button` component
+it might be better to add a `$type` property to the `Button` component:
 
 ```jsx
-const getButtonColor = type => {
-  switch(type) {
+const getButtonColor = $type => {
+  switch ($type) {
     case "primary":
       return "blue";
     case "secondary":
-      return "green";
+      return "turquoise";
     case "tertiary":
-      return "yellow";
+      return "purple";
     default:
       return "black";
   }
-}
+};
+const Button = styled("button", props => ({
+  color: getButtonColor(props.$type),
+  border: "solid 1px currentColor"
+}));
 
-const Button = styled('button', props => ({
-  color: getButtonColor(props.type)
-}))
-
-<Button type="primary" />
-<Button type="secondary" />
-<Button type="tertiary" />
+return (
+  <>
+    <Button $type="primary">Primary</Button>
+    <Button $type="secondary">Secondary</Button>
+    <Button $type="tertiary">Tertiary</Button>
+  </>
+);
 ```
 
-It's more verbose but you will end up with a single component `Button` that doesn't rely on internal styles of some other component. In the future, you can decide to replace `color` by `backgroundColor` and it will not break "withStyled" components.
+It's more verbose but you will end up with a single component `Button` that doesn't rely on internal styles of some other component.
+In the future, you can decide to replace `color` by `backgroundColor` and it will not break `withStyled` components.
 
 ## displayName
 
@@ -515,7 +513,11 @@ Finally, we need to wrap the root of our application with `ThemeProvider` so the
 
 ## Testing
 
-You can test styled components as any other React component. Just don't forget to wrap the tested component with Styletron's `Provider`!
+You can test styled components as any other React component.
+If you want to test actual styling don't forget to wrap the tested component with Styletron's `Provider`!
+
+If you do not care about styling in your test you can omit the `Provider` and Styletron will use a no-op fallback engine.
+Just be sure to set `NODE_ENV=test` to prevent a whole bunch of console warnings.
 
 ### Snapshot Testing
 
@@ -567,3 +569,35 @@ We captured **both the HTML markup and related CSS**.
 The generated class names are not stable and will change often (unless the component is sandboxed as in the snapshot test above) so you should never target them. If you need a stable selector for your e2e tests, you should add `data-test-id` attribute.
 
 [Puppeteer](https://github.com/GoogleChrome/puppeteer) is a great solution for e2e test!
+
+## `useStyletron` Hook (NEW)
+
+🎉 New in `v5`, Styletron's first [React Hook](https://reactjs.org/docs/hooks-intro.html)!
+
+`useStyletron` introduces a lightweight approach to generating CSS classes for an element or component, **without having to opt in to the standard Styletron styled component API**.
+This allows you to style any element or component _directly_ while still taking advantage of Styletron's efficient CSS generation.
+
+```jsx live
+import { useStyletron } from "styletron-react";
+
+export default () => {
+  const [css] = useStyletron();
+  return (
+    <>
+      <button className={css({ color: "red" })}>Red Button</button>
+      <button className={css({ color: "blue" })}>Blue Button</button>
+    </>
+  );
+};
+```
+
+The `css` function returned by `useStyletron` returns a `string` containing the CSS classes required to style the component.
+We can pass this string directly to an element or component's `classNames` property.
+
+Even more awesome- if you are using `styletron-engine-atomic` the classes returned by `css` will still be deduped with the rest of your Styletron atomic CSS.
+You get all the benefits of inline styling without any of the negative effects-- with almost none of the overhead associated with a styled component.
+
+### Caveats
+
+- By opting out of a styled component you do give up some useful features such as built in overriding, composability, and reusability.
+- You still need to wrap your application code in a Styletron `<Provider />` for the `useStyletron` hook to work correctly.
