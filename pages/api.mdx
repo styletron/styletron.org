@@ -113,7 +113,6 @@ The [styletron-react](https://www.npmjs.com/package/styletron-react) package con
 
 - [`styled`](#styled)
 - [`withStyle`](#withstyle)
-- [`withStyleDeep`](#withstyledeep)
 - [`withTransform`](#withtransform)
 - [`withWrapper`](#withwrapper)
 - [`Provider`](#provider)
@@ -152,34 +151,7 @@ const Foo = styled("div", props => {
 import { withStyle } from "styletron-react";
 ```
 
-Use `withStyle` for style composition via shallow object merging.
-
-#### Params
-
-1. `styledComponent` (`StyledComponent`)
-2. `style` (`Style` | `(props: Object) => Style`)
-
-#### Examples
-
-```jsx
-const Foo = styled("div", { color: "red", background: "red" });
-
-// Static styles
-const Bar = withStyle(Foo, { background: "green" });
-
-// Prop-driven styles
-const Baz = withStyle(Foo, props => ({
-  letterSpacing: props.$crushed ? "-5px" : "0px"
-}));
-```
-
-### `withStyleDeep`
-
-```js
-import { withStyleDeep } from "styletron-react";
-```
-
-Use `withStyleDeep` for style composition via deep object merging.
+Use `withStyle` for style composition via deep object merging.
 
 #### Params
 
@@ -192,13 +164,16 @@ Use `withStyleDeep` for style composition via deep object merging.
 const Foo = styled("div");
 
 // Static styles
-const Bar = withStyleDeep(Foo, {":hover": {background: "green"}});
+const Bar = withStyle(Foo, {":hover": {background: "green"}});
 
 // Props-driven styles
-const Bar = withStyleDeep(Foo, props => ({
+const Bar = withStyle(Foo, props => ({
   ":hover": {background: props.$green ? "green" : "white"}
 });
 ```
+
+`withStyleDeep` has been deprecated in `v5` of Styletron.
+`withStyle` now performs a deep object merge by default as this was what was generally desired.
 
 ### `withTransform`
 
@@ -206,7 +181,7 @@ const Bar = withStyleDeep(Foo, props => ({
 import { withTransform } from "styletron-react";
 ```
 
-Shallow and deep object merging gets the job done most of the time, but for more control over composition, `withTransform` allows for direct style manipulation via an arbitrary transformation function.
+If you need more control over your styling composition, `withTransform` allows for direct style manipulation via an arbitrary transformation function.
 
 #### Params
 
@@ -288,7 +263,9 @@ const App = () => (
 
 #### Browser debug mode
 
-In the browser, there's an optional debug mode which will render debug classes to styled elements which point to the JS source location of the styled component. This mode can be enabled with the `debugMode` prop on the client side `Provider`.
+In the browser, there's an optional debug mode which will render debug classes to styled elements which point to the JS source location of the styled component.
+This mode can be enabled with the `debugMode` prop on the client side `Provider`.
+Note that in a Node context debugMode does not do anything.
 
 ##### Example
 
@@ -343,6 +320,14 @@ interface DebugEngine {
 }
 ```
 
+#### No-op engine fallback
+
+If you forget to wrap your application with Styletron's `Provider`, Styletron switches to a no-op mode (rather than crashing) and will log a warning to the console.
+You probably do not want this for your actual app, but it is a useful convenience when writing tests where you do not care about styling output.
+In those cases, you do not have to worry about setting up Styletron's `Provider`.
+
+Just be sure to set `NODE_ENV=test` to prevent a whole bunch of console warnings.
+
 ### `createStyled`
 
 ```js
@@ -378,4 +363,26 @@ const wrapper = StyledComponent => props => (
 );
 
 const styled = createStyled({ getInitialStyle, driver, wrapper });
+```
+
+### `useStyletron`
+
+A [React Hook](https://reactjs.org/docs/hooks-intro.html) that returns a function for generating Styletron CSS classes.
+
+#### `css` Params
+
+1. `style` (`(StyleObject) => string`)
+
+#### Examples
+
+```jsx
+import { useStyletron } from "styletron-react";
+
+const Button = () => {
+  // Use `css` to generate a string containing CSS classes
+  const [css] = useStyletron();
+
+  // Note how we pass the generated string directly to the `className` prop
+  return <button className={css({ color: "blue" })}>Blue Button</button>;
+};
 ```
