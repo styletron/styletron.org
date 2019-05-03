@@ -109,7 +109,6 @@ class Layout extends React.Component {
     const anchors = ROUTES[pathIndex].anchors;
     let activeAnchor = anchors[0];
     anchors.forEach(anchor => {
-      console.log(cleanAnchor(anchor));
       const el = document.getElementById(cleanAnchor(anchor));
       if (el.getBoundingClientRect().top - 26 < 0) {
         activeAnchor = anchor;
