@@ -22,12 +22,12 @@ export const ROUTES = [
       "Props Filtering",
       "$as prop",
       "$style prop",
+      "useStyletron Hook",
       "Refs",
       "Composing Styles",
       "displayName",
       "Themes",
-      "Testing",
-      "useStyletron Hook (NEW)"
+      "Testing"
     ]
   },
   {
