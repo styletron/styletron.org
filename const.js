@@ -27,7 +27,8 @@ export const ROUTES = [
       "Composing Styles",
       "displayName",
       "Themes",
-      "Testing"
+      "Testing",
+      "Debugging"
     ]
   },
   {

@@ -31,14 +31,17 @@ yarn add styletron-engine-atomic styletron-react
 
 ```jsx
 import { Provider as StyletronProvider } from "styletron-react";
-import { Client as Styletron } from "styletron-engine-atomic";
+import { Client as Styletron, DebugEngine } from "styletron-engine-atomic";
+
+const debug =
+  process.env.NODE_ENV === "production" ? void 0 : new DebugEngine();
 
 // 1. Create a client engine instance
 const engine = new Styletron();
 
 // 2. Provide the engine to the app
 React.render(
-  <StyletronProvider value={engine}>
+  <StyletronProvider value={engine} debug={debug} debugAfterHydration>
     <App />
   </StyletronProvider>
 );
@@ -125,162 +128,41 @@ export default Home;
 
 ## With Next.js
 
-[Next.js](https://nextjs.org/) is a popular React framework. First, add Styletron dependencies:
+[Next.js](https://nextjs.org/) is a popular React framework. There is an example [Next.js + Styletron app](https://github.com/zeit/next.js/tree/canary/examples/with-styletron). You can bootstrap a new project by:
 
 ```bash
-yarn add styletron-engine-atomic styletron-react
+yarn create next-app --example with-styletron with-styletron-app
 ```
 
-Create `styletron.js`:
+Run the app:
 
-```js
-import { Client, Server } from "styletron-engine-atomic";
-
-const getHydrateClass = () =>
-  document.getElementsByClassName("_styletron_hydrate_");
-
-export const styletron =
-  typeof window === "undefined"
-    ? new Server()
-    : new Client({
-        hydrate: getHydrateClass()
-      });
 ```
-
-Create or update `pages/_app.js`:
-
-```jsx
-import React from "react";
-import App, { Container } from "next/app";
-import { Provider as StyletronProvider } from "styletron-react";
-import { styletron } from "../styletron";
-
-export default class MyApp extends App {
-  render() {
-    const { Component, pageProps } = this.props;
-    return (
-      <Container>
-        <StyletronProvider value={styletron}>
-          <Component {...pageProps} />
-        </StyletronProvider>
-      </Container>
-    );
-  }
-}
-```
-
-Create or update `pages/_document.js`:
-
-```jsx
-import Document, { Head, Main, NextScript } from "next/document";
-import { Provider as StyletronProvider } from "styletron-react";
-import { styletron } from "../styletron";
-
-class MyDocument extends Document {
-  static getInitialProps(props) {
-    const page = props.renderPage(App => props => (
-      <StyletronProvider value={styletron}>
-        <App {...props} />
-      </StyletronProvider>
-    ));
-    const stylesheets = styletron.getStylesheets() || [];
-    return { ...page, stylesheets };
-  }
-
-  render() {
-    return (
-      <html>
-        <Head>
-          {this.props.stylesheets.map((sheet, i) => (
-            <style
-              className="_styletron_hydrate_"
-              dangerouslySetInnerHTML={{ __html: sheet.css }}
-              media={sheet.attrs.media}
-              data-hydrate={sheet.attrs["data-hydrate"]}
-              key={i}
-            />
-          ))}
-        </Head>
-        <body>
-          <Main />
-          <NextScript />
-        </body>
-      </html>
-    );
-  }
-}
-
-export default MyDocument;
-```
-
-That's it! Now you should be able to style your components and the styles should be server-side rendered. `pages/index.js`:
-
-```jsx
-import { styled } from "styletron-react";
-
-const Colored = styled("div", { color: "blue" });
-
-function Home() {
-  return <Colored>Welcome to Next.js!</Colored>;
-}
-
-export default Home;
+yarn
+yarn dev
 ```
 
 ## With Gatsby
 
-[Gatsby](https://www.gatsbyjs.org) is a fast modern site generator for React. First, add Styletron dependencies:
+[Gatsby](https://www.gatsbyjs.org) is a fast modern site generator for React. There is a [gatsby-plugin-styletron](https://www.gatsbyjs.org/packages/gatsby-plugin-styletron/). First, add it to your Gatsby app:
 
 ```bash
-yarn add styletron-engine-atomic styletron-react
+yarn add gatsby-plugin-styletron
 ```
 
-Update `gatsby-browser.js`:
+and edit `gatsby-config.js`:
 
-```jsx
-import React from "react";
-import { Client as Styletron } from "styletron-engine-atomic";
-import { Provider } from "styletron-react";
-
-const engine = new Styletron({
-  hydrate: document.getElementsByClassName("_styletron_hydrate_")
-});
-
-export const wrapRootElement = ({ element }, options) => (
-  <Provider value={engine}>{element}</Provider>
-);
-```
-
-Update `gatsby-ssr.js`:
-
-```jsx
-import React from "react";
-import { Server as Styletron } from "styletron-engine-atomic";
-import { Provider } from "styletron-react";
-
-const engine = new Styletron();
-
-export const wrapRootElement = ({ element }, options) => (
-  <Provider value={engine}>{element}</Provider>
-);
-
-export const onRenderBody = ({ setHeadComponents }, options) => {
-  const stylesheets = engine.getStylesheets();
-  const headComponents = stylesheets[0].css
-    ? stylesheets.map((sheet, index) => (
-        <style
-          className="_styletron_hydrate_"
-          dangerouslySetInnerHTML={{
-            __html: sheet.css
-          }}
-          key={index}
-          media={sheet.attrs.media}
-          data-hydrate={sheet.attrs["data-hydrate"]}
-        />
-      ))
-    : null;
-
-  setHeadComponents(headComponents);
+```js
+module.exports = {
+  plugins: [
+    {
+      resolve: "gatsby-plugin-styletron",
+      options: {
+        // You can pass options to Styletron.
+        // Prefix all generated classNames:
+        prefix: "_"
+      }
+    }
+  ]
 };
 ```
 
