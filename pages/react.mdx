@@ -17,6 +17,7 @@ export default Layout;
 9. [displayName](#displayname)
 10. [Themes](#themes)
 11. [Testing](#testing)
+12. [Debugging](#debugging)
 
 ## Motivation
 
@@ -601,3 +602,16 @@ We captured **both the HTML markup and related CSS**.
 The generated class names are not stable and will change often (unless the component is sandboxed as in the snapshot test above) so you should never target them. If you need a stable selector for your e2e tests, you should add `data-test-id` attribute.
 
 [Puppeteer](https://github.com/GoogleChrome/puppeteer) is a great solution for e2e test!
+
+## Debugging
+
+Generated atomic classnames can make the resulting output less readable. However, Styletron provides sourcemaps so you can quickly jump to the source code when inspecting elements. This debugging mode needs to be enabled (default setting for Fusion, Next.js and Gatsby apps). Please follow the [Getting started](/getting-started) section for more information.
+
+<img
+  style={{ width: "100%", maxWidth: "414px" }}
+  src="https://user-images.githubusercontent.com/780408/39457018-ac42410e-4c9f-11e8-91e7-ac2da8bfe230.gif"
+/>
+
+As you can see, Styletron adds an extra `.__debug_x` class to every element. It's only purpose is linking you to the JavaScript code that created those elements.
+
+If you are interested how this feature works under the hood, read the [Generating CSS to JS Source Maps with Web Workers and WebAssembly](https://ryantsao.com/blog/generating-css-to-js-source-maps-with-web-workers-and-webassembly) article.
