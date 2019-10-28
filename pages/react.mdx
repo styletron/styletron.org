@@ -521,13 +521,21 @@ You can test styled components as any other React component. Just don't forget t
 
 One popular approach is [snapshot testing](https://jestjs.io/docs/en/snapshot-testing). You can emit (render) the HTML markup, save it into a file and diff it on the next run. This will prevent unwanted changes in the component's output.
 
-**With Styletron you can take this approach one step further**. Your styles live in JavaScript now, so you can extract them into a single string and add them to your snapshots. If you use [Jest](https://jestjs.io/) and [react-test-renderer](https://reactjs.org/docs/test-renderer.html) ([Enzyme](https://airbnb.io/enzyme/) would work too!), you could do something like this:
+To test Styletron components, please add the `styletron-engine-snapshot` package to your application. This package provides a deterministic engine that simply returns a `JSON.stringify`-ed version of the style object (with alpha-sorted keys).
+
+```bash
+yarn add --dev styletron-engine-snapshot
+```
+
+Once you've installed the `styletron-engine-snapshot` package, you can start using it in your tests - if you use [Jest](https://jestjs.io/) and [react-test-renderer](https://reactjs.org/docs/test-renderer.html) ([Enzyme](https://airbnb.io/enzyme/) would work too!), you could do something like this:
 
 ```jsx
 import React from "react";
 import renderer from "react-test-renderer";
 import { styled, Provider } from "styletron-react";
-import { Server } from "styletron-engine-atomic";
+import {StyletronSnapshotEngine} from 'styletron-engine-snapshot';
+
+const snapshotEngine = new StyletronSnapshotEngine();
 
 // tested component
 const Button = styled("button", {
@@ -535,32 +543,29 @@ const Button = styled("button", {
 });
 
 test("Button", () => {
-  const styletron = new Server();
   const component = renderer.create(
-    <Provider value={styletron}>
+    <Provider value={snapshotEngine}>
       <Button>Text</Button>
     </Provider>
   );
-  expect(styletron.getCss()).toMatchSnapshot("CSS");
-  expect(component.toJSON()).toMatchSnapshot("HTML");
+  expect(component.toJSON()).toMatchSnapshot();
 });
 ```
 
-This creates two snapshots:
+This captures **both the HTML markup and related CSS**:
 
-```text
-exports[`Button: CSS 1`] = `".ae{color:red}"`;
+```
+// Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Button: HTML 1`] = `
+exports[`Button 1`] = `
 <button
-  className="ae"
+  className="style={ color: 'red' }
+"
 >
   Text
 </button>
 `;
 ```
-
-We captured **both the HTML markup and related CSS**.
 
 ### End-to-end Testing
 
