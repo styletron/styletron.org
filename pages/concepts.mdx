@@ -33,16 +33,20 @@ CSS properties are defined as a JS object and that has some limitations compared
 translates into
 
 ```jsx live
-import { styled } from "styletron-react";
+import { useStyletron } from "styletron-react";
 
 export default () => {
-  const Button = styled("button", {
-    color: "red",
-    fontSize: "16px",
-    paddingLeft: "1em",
-    paddingRight: "1em"
-  });
-  return <Button>Button</Button>;
+  const [css] = useStyletron();
+  return (
+    <button className={css({
+      color: "red",
+      fontSize: "16px",
+      paddingLeft: "1em",
+      paddingRight: "1em"
+    })}>
+      Button
+    </button>
+  );
 };
 ```
 

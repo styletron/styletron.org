@@ -24,25 +24,18 @@ export default Layout;
 **React components are independent and reusable pieces of UI**. They accept props and return a description of what should appear on the screen - typically, in the form of HTML markup. For long time, the styles were left outside of React components and handled by different means. You probably wrote or saw this code before:
 
 ```jsx live
-class MyApp extends React.Component {
-  constructor() {
-    this.state = {
-      isActive: false
-    };
-  }
-  render() {
-    const { isActive } = this.state;
-    return (
-      <button
-        className={`btn ${isActive ? "btn-active" : ""}`}
-        onClick={() => {
-          this.setState(prev => ({ isActive: !prev.isActive }));
-        }}
-      >
-        It is {isActive ? "on" : "off"}!
-      </button>
-    );
-  }
+function App () {
+  const [isActive, setIsActive] = useState(false);
+  return (
+    <button
+      className={`btn ${isActive ? "btn-active" : ""}`}
+      onClick={() => {
+        setIsActive(!isActive);
+      }}
+    >
+      It is {isActive ? "on" : "off"}!
+    </button>
+  )
 }
 ```
 
