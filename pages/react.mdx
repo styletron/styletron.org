@@ -54,16 +54,10 @@ _Side note: CSS modules partly addresses some of these concerns but requires ext
 Things are looking grim so far. What if I told you **we can solve enable dynamic styling and support portability by using inline styles**?
 
 ```jsx live
-class MyApp extends React.Component {
-  constructor() {
-    this.state = {
-      isActive: false
-    };
-  }
-  render() {
-    const { isActive } = this.state;
-    return (
-      <button
+function App () {
+  const [isActive, setIsActive] = useState(false);
+  return (
+     <button
         style={{
           padding: "0.5em 1em",
           color: isActive ? "#fff" : "#000",
@@ -73,13 +67,12 @@ class MyApp extends React.Component {
           border: "1px solid #aaa"
         }}
         onClick={() => {
-          this.setState(prev => ({ isActive: !prev.isActive }));
+          setIsActive(!isActive);
         }}
-      >
-        It is {isActive ? "on" : "off"}!
-      </button>
-    );
-  }
+    >
+      It is {isActive ? "on" : "off"}!
+    </button>
+  )
 }
 ```
 
@@ -96,36 +89,29 @@ If there was only a way how to get the best of both worlds. 🤔
 ```jsx live
 import { styled } from "styletron-react";
 
-class MyApp extends React.Component {
-  constructor() {
-    this.state = {
-      isActive: false
-    };
-  }
-  render() {
-    const Button = styled("button", props => ({
-      padding: "0.5em 1em",
-      color: props.$isActive ? "#fff" : "#000",
-      background: props.$isActive ? "#276ef1" : "none",
-      fontSize: "1em",
-      borderRadius: "4px",
-      border: "1px solid #aaa",
-      ":hover": {
-        background: props.$isActive ? "green" : "yellow"
-      }
-    }));
-    const { isActive } = this.state;
-    return (
-      <Button
-        $isActive={isActive}
-        onClick={() => {
-          this.setState(prev => ({ isActive: !prev.isActive }));
-        }}
-      >
-        It is {isActive ? "on" : "off"}!
-      </Button>
-    );
-  }
+function App () {
+  const Button = styled("button", props => ({
+    padding: "0.5em 1em",
+    color: props.$isActive ? "#fff" : "#000",
+    background: props.$isActive ? "#276ef1" : "none",
+    fontSize: "1em",
+    borderRadius: "4px",
+    border: "1px solid #aaa",
+    ":hover": {
+      background: props.$isActive ? "green" : "yellow"
+    }
+  }));
+  const [isActive, setIsActive] = useState(false);
+  return (
+    <Button
+      $isActive={isActive}
+      onClick={() => {
+        setIsActive(!isActive);
+      }}
+    >
+      It is {isActive ? "on" : "off"}!
+    </Button>
+  )
 }
 ```
 
@@ -135,6 +121,8 @@ The `styled` function expects two arguments:
 
 - **Element type** - What underlying DOM element should be used. In our case, we chose `button`.
 - **Style function / object** - To describe the styles. It can be a plain style object or a function that returns a style object. The function gets `props`. That's useful if your styles need to be dynamic (derived from `props`).
+
+> Styletron supports hooks too for styling - you can skip to the [useStyletron](#usestyletron-hook) section here.
 
 For styling properties, we use camelCase and there are some other subtle differences described in [Concepts](/concepts). We can also now use pseudo classes as `:hover`. **The inline styles limitations don't apply anymore!**
 
