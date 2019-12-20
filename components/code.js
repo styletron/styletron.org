@@ -1,3 +1,4 @@
+import {useState} from "react";
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
 import { useHover } from "./hooks";
 import {
@@ -40,6 +41,7 @@ const Code = ({ code }) => (
       withStyle,
       withTransform,
       useHover,
+      useState,
       createStyled,
       driver,
       getInitialStyle,

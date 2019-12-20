@@ -178,12 +178,13 @@ That's it! Now you should be able to style your components and the styles should
 
 ```jsx
 import React from "react";
-import { styled } from "styletron-react";
-
-const Colored = styled("div", { color: "blue" });
+import { useStyletron } from "styletron-react";
 
 function Home() {
-  return <Colored>Welcome to Gatsby!</Colored>;
+  const [css] = useStyletron();
+  return <div className={css({
+    color: 'blue',
+  })}>Welcome to Gatsby!</div>;
 }
 
 export default Home;
