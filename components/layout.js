@@ -96,7 +96,7 @@ class Layout extends React.Component {
         : null
   };
   componentDidMount() {
-    if (Array.isArray(ROUTES[this.getPathIndex()].anchors)) {
+    if (Array.isArray(ROUTES[this.getPathIndex()] && Array.isArray(ROUTES[this.getPathIndex()].anchors))) {
       document.addEventListener("scroll", this.debouncedOnScroll);
       this.onScroll();
     }
