@@ -136,7 +136,7 @@ class Layout extends React.Component {
             </MDXProvider>
             <PrevNextLinks>
               {prevRoute > -1 ? (
-                <Link href={ROUTES[prevRoute].path} prefetch>
+                <Link href={ROUTES[prevRoute].path}>
                   <a target={getATarget(ROUTES[prevRoute].path)}>
                     ← {ROUTES[prevRoute].text}
                   </a>
@@ -145,7 +145,7 @@ class Layout extends React.Component {
                 <div />
               )}
               {nextRoute > -1 ? (
-                <Link href={ROUTES[nextRoute].path} prefetch>
+                <Link href={ROUTES[nextRoute].path}>
                   <a target={getATarget(ROUTES[nextRoute].path)}>
                     {ROUTES[nextRoute].text} →
                   </a>
