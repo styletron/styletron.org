@@ -1,5 +1,5 @@
 import React from "react";
-import App, { Container } from "next/app";
+import App from "next/app";
 import Head from "next/head";
 import { Provider as StyletronProvider, styled } from "styletron-react";
 import Router from "next/router";
@@ -30,7 +30,7 @@ export default class MyApp extends App {
   render() {
     const { Component, pageProps, path } = this.props;
     return (
-      <Container>
+      <>
         <Head>
           <title>Styletron</title>
         </Head>
@@ -39,7 +39,7 @@ export default class MyApp extends App {
             <Component {...pageProps} path={path} />
           </Content>
         </StyletronProvider>
-      </Container>
+      </>
     );
   }
 }

@@ -79,10 +79,17 @@ export default {
     const parts = href.split("#");
     const internal =
       (parts[0] === "" && parts[1] !== "") || !href.includes("http");
+
+    if (internal) {
+      return (
+        <Link href={href}>
+          <a>{children}</a>
+        </Link>
+      )
+    }
+
     return (
-      <Link href={href} prefetch={internal}>
-        <a target={internal ? undefined : "_blank"}>{children}</a>
-      </Link>
+      <a href={href} target="_blank">{children}</a>
     );
   },
   pre: ({ children }) => children,

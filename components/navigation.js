@@ -51,7 +51,7 @@ const Navigation = ({ isVisible, pathIndex, activeAnchor }) => (
     {ROUTES.map((route, index) => (
       <React.Fragment key={route.path}>
         <SidebarItem $active={pathIndex === index}>
-          <Link href={route.path} prefetch={!route.path.includes("http")}>
+          {route.path.includes("http") ? (
             <StyledLink
               target={getATarget(route.path)}
               $active={pathIndex === index}
@@ -59,7 +59,17 @@ const Navigation = ({ isVisible, pathIndex, activeAnchor }) => (
             >
               {route.text}
             </StyledLink>
-          </Link>
+          ) : (
+            <Link href={route.path}>
+              <StyledLink
+                target={getATarget(route.path)}
+                $active={pathIndex === index}
+                href={route.path}
+              >
+                {route.text}
+              </StyledLink>
+            </Link>
+          )}
         </SidebarItem>
         {pathIndex === index &&
           ROUTES[pathIndex].anchors.map(anchor => (
