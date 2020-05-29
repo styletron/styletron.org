@@ -12,8 +12,25 @@ yarn add styletron-engine-atomic styletron-react
 
 ## Packages
 
-- [styletron-engine-atomic](https://www.npmjs.com/package/styletron-engine-atomic) is all you need to start with Styletron. It is an implementation of the [styletron-standard](https://www.npmjs.com/package/styletron-standard) engine interface.
-- [styletron-react](https://www.npmjs.com/package/styletron-react) provides additional React bindings so you can easily create styled React components.
+### [styletron-engine-atomic](https://www.npmjs.com/package/styletron-engine-atomic)
+
+This package is all you need to start with Styletron. It is an implementation of the [styletron-standard](https://www.npmjs.com/package/styletron-standard) engine interface.
+
+### [styletron-react](https://www.npmjs.com/package/styletron-react)
+
+This package provides additional React bindings so you can easily create styled React components.
+
+### [styletron-engine-monolithic](https://www.npmjs.com/package/styletron-engine-monolithic)
+
+This package is an alternative implementation of the [styletron-standard](https://www.npmjs.com/package/styletron-standard) engine interface. The monolithic engine is a superset of the atomic engine - everything that works in the atomic engine will keep working with the monolithic engine. In comparison with the atomic engine:
+- class names are stable (hashes) in the monolithic engine, so components can be cross-referenced,
+- using the monolithic engine, you can mix longhand and shorthand properties,
+- media queries are not sorted, since the order is always respected,
+- it supports [@supports](https://developer.mozilla.org/en-US/docs/Web/CSS/@supports).
+
+These improvements are made possible by sacrificing the minimal CSS footprint the atomic engine thrives for.
+
+### Types
 
 Styletron is [Flow typed](https://flow.org/) by default. Do you use TypeScript?
 
@@ -21,6 +38,10 @@ Styletron is [Flow typed](https://flow.org/) by default. Do you use TypeScript?
 yarn add @types/styletron-standard
 yarn add @types/styletron-react
 yarn add @types/styletron-engine-atomic
+
+# we do not have typescript definitions for the monolithic engine yet
+# are you interested in adding them?
+# let us know at https://github.com/styletron/styletron/issues
 ```
 
 ## Starting with
@@ -94,6 +115,36 @@ import {Client as Styletron} from "styletron-engine-atomic";
 React.render(
   <StyletronProvider value={engine}>
     <App/>
+  </StyletronProvider>
+);
+```
+
+#### Using the monolithic engine
+
+The setup is the same as with the atomic engine - the only difference is that we have to replace `styletron-engine-atomic` with `styletron-engine-monolithic`.
+
+##### Add `styletron-engine-monolithic` as a dependency
+
+```bash
+yarn add styletron-engine-monolithic styletron-react
+```
+
+##### Add `styletron-engine-monolithic` to your project
+
+```js
+import { Provider as StyletronProvider, DebugEngine } from "styletron-react";
+import { Client as Styletron } from "styletron-engine-monolithic";
+
+const debug =
+  process.env.NODE_ENV === "production" ? void 0 : new DebugEngine();
+
+// 1. Create a client engine instance
+const engine = new Styletron();
+
+// 2. Provide the engine to the app
+React.render(
+  <StyletronProvider value={engine} debug={debug} debugAfterHydration>
+    <App />
   </StyletronProvider>
 );
 ```
