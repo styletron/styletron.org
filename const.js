@@ -47,7 +47,7 @@ export const ROUTES = [
   },
   {
     text: "API",
-    path: "/api",
+    path: "/apis",
     anchors: [
       "Client",
       "Server",
