@@ -135,7 +135,7 @@ class Layout extends React.Component {
               {this.props.children}
             </MDXProvider>
             <PrevNextLinks>
-              {prevRoute > -1 ? (
+              {prevRoute > -1 && !ROUTES[prevRoute].path.includes('http') ? (
                 <Link href={ROUTES[prevRoute].path}>
                   <a target={getATarget(ROUTES[prevRoute].path)}>
                     ← {ROUTES[prevRoute].text}
@@ -144,7 +144,7 @@ class Layout extends React.Component {
               ) : (
                 <div />
               )}
-              {nextRoute > -1 ? (
+              {nextRoute > -1 && !ROUTES[nextRoute].path.includes('http') ? (
                 <Link href={ROUTES[nextRoute].path}>
                   <a target={getATarget(ROUTES[nextRoute].path)}>
                     {ROUTES[nextRoute].text} →

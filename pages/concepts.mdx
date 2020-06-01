@@ -1,4 +1,5 @@
 import Layout from "../components/layout";
+import {Notification} from "../components/notification";
 
 export default Layout;
 
@@ -402,6 +403,8 @@ export default () => {
 
 ### Shorthand And Longhand Properties
 
+<Notification>If you use styletron-engine-monolithic, this restriction does not apply to you, you can mix longhand and shorthand properties.</Notification>
+
 Many CSS properties can be defined through the shorthand syntax. For example
 
 ```css
@@ -443,6 +446,8 @@ it's not clear if the `border-width` will be `5px` or `2px`. Why?
 The order is not deterministic. Also, Styletron splits each rule into a separate CSS class (Atomic CSS) and reuses same classes across multiple styled components. **So if some other component already uses the `borderWidth: '5px'`** rule and is mounted before the `Content` component, there is a great chance that **you will end up with `2px`** since the order of in which CSS classes are defined matters and Styletron adds them incrementally as components are being mounted.
 
 ### Media Queries Order
+
+<Notification>If you use styletron-engine-monolithic, this restriction does not apply to you, the order is always respected.</Notification>
 
 Media queries have a similar ordering problem as [Shorthand And Longhand Properties](#shorthand-and-longhand-properties). The order of media query definitions matters. Imagine these two scenarios:
 
