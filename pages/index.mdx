@@ -13,16 +13,16 @@ export default Layout;
 ## Example
 
 ```jsx live
-import { useStyletron } from "styletron-react";
+import { styled } from "styletron-react";
 
 export default () => {
-  const [css] = useStyletron()
   // Create a styled component by passing
-  // a style object
-  return <a href="/getting-started" className={css({
-    fontSize: '20px',
-    color: 'red',
-  })}>Start!</a>;
+  // an element name and a style object
+  const Anchor = styled("a", {
+    fontSize: "20px",
+    color: "red"
+  });
+  return <Anchor href="/getting-started">Start!</Anchor>;
 };
 ```
 
