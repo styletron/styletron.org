@@ -23,6 +23,7 @@ This package provides additional React bindings so you can easily create styled 
 ### [styletron-engine-monolithic](https://www.npmjs.com/package/styletron-engine-monolithic)
 
 This package is an alternative implementation of the [styletron-standard](https://www.npmjs.com/package/styletron-standard) engine interface. The monolithic engine is a superset of the atomic engine - everything that works in the atomic engine will keep working with the monolithic engine. In comparison with the atomic engine:
+
 - class names are stable (hashes) in the monolithic engine, so components can be cross-referenced,
 - using the monolithic engine, you can mix longhand and shorthand properties,
 - media queries are not sorted, since the order is always respected,
@@ -69,6 +70,7 @@ const debug =
 const engine = new Styletron();
 
 // 2. Provide the engine to the app
+// debug engine needs inlined source maps
 React.render(
   <StyletronProvider value={engine} debug={debug} debugAfterHydration>
     <App />
@@ -142,6 +144,7 @@ const debug =
 const engine = new Styletron();
 
 // 2. Provide the engine to the app
+// debug engine needs inlined source maps
 React.render(
   <StyletronProvider value={engine} debug={debug} debugAfterHydration>
     <App />
@@ -218,10 +221,10 @@ module.exports = {
       options: {
         // You can pass options to Styletron.
         // Prefix all generated classNames:
-        prefix: "_"
-      }
-    }
-  ]
+        prefix: "_",
+      },
+    },
+  ],
 };
 ```
 
@@ -233,9 +236,15 @@ import { useStyletron } from "styletron-react";
 
 function Home() {
   const [css] = useStyletron();
-  return <div className={css({
-    color: 'blue',
-  })}>Welcome to Gatsby!</div>;
+  return (
+    <div
+      className={css({
+        color: "blue",
+      })}
+    >
+      Welcome to Gatsby!
+    </div>
+  );
 }
 
 export default Home;
