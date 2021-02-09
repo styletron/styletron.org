@@ -49,8 +49,8 @@ export const ROUTES = [
     text: "API",
     path: "/api-reference",
     anchors: [
-      "Client",
-      "Server",
+      "styletron-engine-monolithic",
+      "styletron-engine-atomic",
       "styled",
       "withStyle",
       "withTransform",
