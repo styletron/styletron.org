@@ -4,8 +4,109 @@ export default Layout;
 
 # API
 
-1. [styletron-engine-atomic](#styletron-engine-atomic)
-2. [styletron-react](#styletron-react)
+1. [styletron-engine-monolithic](#styletron-engine-monolithic)
+2. [styletron-engine-atomic](#styletron-engine-atomic)
+3. [styletron-react](#styletron-react)
+
+## styletron-engine-monolithic
+
+Monolithic implementation of the [styletron-standard](https://www.npmjs.com/package/styletron-standard) engine interface. This package [styletron-engine-monolithic](https://www.npmjs.com/package/styletron-engine-monolithic) provides two named exports:
+
+- [`Client`](#client) - Client-side engine class
+- [`Server`](#server) - Server-side engine class
+
+### `Client`
+
+```js
+import { Client } from "styletron-engine-monolithic";
+```
+
+#### `.constructor(opts?: {prefix?: string, hydrate?: HTMLStyleElement[], container: Element})`
+
+##### Options
+
+- `prefix?: string` The prefix to be used for all generated class names.
+- `hydrate?: HTMLStyleElement[]` Collection of server-rendered style elements. Hydration is required when server-side rendering.
+- `container?: Element` The element that new stylesheets should be appended to. Defaults to the parent element of the first stylesheet passed via `hydrate`, otherwise defaults to `document.head`.
+
+```js
+const instance = new Client();
+```
+
+- [`.renderStyle(style) => string`](#renderstylestyle-string)
+- [`.renderKeyframes(keyframes) => string`](#renderkeyframeskeyframes-string)
+- [`.renderFontFace(fontFace) => string`](#renderfontfacefontface-string)
+
+### `Server`
+
+```js
+import { Server } from "styletron-engine-monolithic";
+```
+
+#### `.constructor(opts?: {prefix?: string})`
+
+##### Options
+
+- `prefix?: string` The prefix to be used for all generated class names.
+
+```js
+const instance = new Server();
+```
+
+#### `.getStylesheets() => Array<{css: string, attrs: {[string]: string}}>`
+
+Returns styles as an array of stylesheet objects.
+
+#### `.getStylesheetsHtml(className: string) => string`
+
+Returns styles as a string of HTML that can also be used for client-side hydration.
+
+#### `.getCss() => string`
+
+Returns styles as a string of CSS for purely server-side rendering use cases where no client-side hydration is needed.
+
+- [`.renderStyle(style) => string`](#renderstylestyle-string)
+- [`.renderKeyframes(keyframes) => string`](#renderkeyframeskeyframes-string)
+- [`.renderFontFace(fontFace) => string`](#renderfontfacefontface-string)
+
+### Universal methods
+
+These methods exist on both the server and client instances.
+
+#### `.renderStyle(style) => string`
+
+Renders a given style object, returning the corresponding generated class name.
+
+```js
+instance.renderStyle({
+  color: "red",
+  fontSize: "12px",
+});
+// → "css-abc"
+```
+
+#### `.renderKeyframes(keyframes) => string`
+
+Renders a given keyframes object, returning the corresponding generated `@keyframes` rule name.
+
+```js
+const animationName = instance.renderKeyframes({
+  from: { color: "red" },
+  to: { color: "blue" },
+});
+// → "animation-abc"
+```
+
+#### `.renderFontFace(fontFace) => string`
+
+Renders a given font face object, returning the font-family name from the corresponding generated `@font-face` rule.
+
+```js
+const fontFamily = instance.renderFontFace({
+  src: "...",
+});
+// → "font-abc"
+```
 
 ## styletron-engine-atomic
 

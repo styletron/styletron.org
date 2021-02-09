@@ -9,7 +9,7 @@ const SidebarItem = styled("li", ({ $anchor, $active }) => ({
     ? "0rem 2rem 0.75rem 3rem"
     : `0.75rem 2rem ${$active ? "0.5rem" : "0.75rem"} 2rem`,
   fontSize: $anchor ? "14px" : "16px",
-  width: "8em"
+  width: "14em"
 }));
 
 const StyledLink = styled("a", ({ $active }) => ({
@@ -27,7 +27,7 @@ const SidebarList = styled("ul", ({ $isVisible }) => ({
   padding: "0.5em 0em",
   borderLeft: "none",
   position: "absolute",
-  width: "15em",
+  width: "16em",
   right: "-6px",
   borderRadius: "6px",
   boxShadow: "rgba(0, 0, 0, 0.3) 0 2px 10px",
